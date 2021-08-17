@@ -5,8 +5,7 @@
 
 # This script is necessary because loader script needs to be executed from
 # $SNAP_DATA/greengrass/v2/alts/current/distro/bin path.
-# Referencing this path from the snapcraft.yaml file results in <path> does not exist errors
-# https://paste.amazon.com/show/kucnavya/1628107651
+# Referencing this path from the snapcraft.yaml file results in path does not exist errors
 
 set -o xtrace
 
