@@ -72,7 +72,7 @@ parts:
 
   wrapper-scripts:
     plugin: dump
-    source: parts/wrapper-scripts/
+    source: wrapper-scripts/
     organize:
       # put all contents inside a directory
       '*': wrapper-scripts/
