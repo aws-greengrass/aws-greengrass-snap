@@ -3,6 +3,6 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-cd "$SNAP"/ || exit
-
-cp -r greengrass $SNAP_DATA/ || exit 1
+# Set default value for greengrass config.
+# For now, it doesn't matter if this is invalid as user will provide config during setup
+snapctl set greengrass-config="$HOME/defaultconfig.yaml"
