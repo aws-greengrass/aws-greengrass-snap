@@ -8,7 +8,13 @@ summary: AWS supported software that extends cloud capabilities to local devices
 description: |
   AWS supported software that extends cloud capabilities to local devices.
 grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+confinement: strict
+
+# declare home plug to allow access to files owned by the user in the user’s home ($HOME) directory
+plugs:
+  home-for-greengrass:
+    interface: home
+    read: all
 
 parts:
   greengrass:
@@ -52,30 +58,9 @@ parts:
       cp /etc/ssl/certs/java/cacerts \
               "$SNAPCRAFT_PART_INSTALL/etc/ssl/certs/java/cacerts" \
               || exit 6
-
-      # cd back into install dir
-      cd "$SNAPCRAFT_PART_INSTALL" || exit 2
-      mkdir -p $SNAPCRAFT_PART_INSTALL/greengrass/v2 || exit 2
-      java -Droot=$SNAPCRAFT_PART_INSTALL/greengrass/v2  -Dlog.store=FILE  -jar $SNAPCRAFT_PART_INSTALL/lib/Greengrass.jar --start false
-
-      # greengrass installer creates symlinks with absolute paths.
-      # This breaks the symlinks in the final snap (absolute paths refer to /root/parts path)
-      # Therefore, remove and re-add the right symlinks with relative paths
-      rm ./greengrass/v2/alts/init/distro
-      rm ./greengrass/v2/alts/current
-
-      ln -s init ./greengrass/v2/alts/current
-      ln -s ../../packages/artifacts-unarchived/aws.greengrass.Nucleus/2.4.0/aws.greengrass.nucleus  ./greengrass/v2/alts/init/distro
-
-      # Convert loader script into an executable
-      chmod +x ./greengrass/v2/alts/current/distro/bin/loader
-
   wrapper-scripts:
     plugin: dump
-    source: wrapper-scripts/
-    organize:
-      # put all contents inside a directory
-      '*': wrapper-scripts/
+    source: local-scripts/
 
 layout:
   # symlink java
@@ -84,4 +69,17 @@ layout:
 
 apps:
   greengrass:
-    command: wrapper-scripts/exec-loader.sh
+    command: exec-loader.sh
+    daemon: simple
+    install-mode: disable
+    plugs:
+      - mount-observe
+      - network-bind
+      - process-control
+      - hardware-observe
+      - log-observe
+      - home-for-greengrass
+
+system-usernames:
+  snap_daemon:
+    scope: shared
