@@ -11,14 +11,15 @@ set -o xtrace
 
 GREENGRASS_CONFIG="$(snapctl get greengrass-config)"
 
+export DOCKER_ENV="$SNAP/docker-env"
+export PATH="$DOCKER_ENV/usr/sbin:$DOCKER_ENV/usr/bin:$DOCKER_ENV/sbin:$DOCKER_ENV/bin:$PATH"
+
 # cd into install dir
 cd "$SNAP_DATA" || exit 1
 mkdir -p $SNAP_DATA/greengrass/v2 || exit 2
 java -Droot=$SNAP_DATA/greengrass/v2 -Dlog.store=FILE -jar $SNAP/lib/Greengrass.jar \
-     --start false --init-config $GREENGRASS_CONFIG --component-default-user snap_daemon:snap_daemon || exit 3
+     --start false --init-config $GREENGRASS_CONFIG --component-default-user root:root || exit 3
 
-# Convert loader script into an executable
-chmod +x ./greengrass/v2/alts/current/distro/bin/loader
 
 cd "$SNAP_DATA/greengrass/v2/alts/current/distro/bin" || exit 4
 # TODO: Avoid running executables from write dir like $SNAP_DATA. Instead try running them from $SNAP

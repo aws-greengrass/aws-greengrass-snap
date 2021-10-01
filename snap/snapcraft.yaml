@@ -15,6 +15,18 @@ plugs:
   home-for-greengrass:
     interface: home
     read: all
+  docker-cli:
+    interface: docker
+  docker-executables:
+    content: docker-executables
+    default-provider: docker
+    interface: content
+    target: $SNAP/docker-env
+ support:
+   interface: docker-support
+ privileged:
+   interface: docker-support
+   privileged-containers: true
 
 parts:
   greengrass:
@@ -79,7 +91,5 @@ apps:
       - hardware-observe
       - log-observe
       - home-for-greengrass
-
-system-usernames:
-  snap_daemon:
-    scope: shared
+      - docker-cli
+      - docker-executables
