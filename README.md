@@ -112,6 +112,9 @@ sudo snap connect aws-iot-greengrass-v2:log-observe
 sudo snap connect aws-iot-greengrass-v2:mount-observe
 sudo snap connect aws-iot-greengrass-v2:network-bind
 sudo snap connect aws-iot-greengrass-v2:process-control
+sudo snap connect aws-iot-greengrass-v2:docker-executables docker:docker-executables
+sudo snap connect aws-iot-greengrass-v2:docker-cli docker:docker-daemon
+sudo snap connect aws-iot-greengrass-v2:root-dot-docker :personal-files
 ```
 
 #### Start the snap
