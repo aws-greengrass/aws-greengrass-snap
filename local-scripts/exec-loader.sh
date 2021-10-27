@@ -11,6 +11,14 @@ set -o xtrace
 
 GREENGRASS_CONFIG="$(snapctl get greengrass-config)"
 
+if [ ! -e "$SNAP_DATA/docker/" ]; then
+    mkdir -p "$SNAP_DATA/docker"
+fi
+
+export DOCKER_CONFIG="$SNAP_DATA/docker"
+export DOCKER_ENV="$SNAP/docker-env"
+export PATH="$DOCKER_ENV/usr/sbin:$DOCKER_ENV/usr/bin:$DOCKER_ENV/sbin:$DOCKER_ENV/bin:$PATH"
+
 # cd into install dir
 cd "$SNAP_DATA" || exit 1
 mkdir -p $SNAP_DATA/greengrass/v2 || exit 2
