@@ -26,6 +26,9 @@ plugs:
     interface: personal-files
     write:
     - $HOME/.docker
+  greengrass-config:
+    interface: content
+    target: $SNAP_DATA/greengrass/v2
 
 parts:
   greengrass:

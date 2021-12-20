@@ -117,6 +117,8 @@ sudo snap connect aws-iot-greengrass-v2:docker-cli docker:docker-daemon
 sudo snap connect aws-iot-greengrass-v2:root-dot-docker :personal-files
 ```
 
+ubuntu@ip-172-31-30-13:~$ sudo snap connect aws-iot-greengrass-v2:greengrass-config gg-config:greengrass-config
+
 #### Start the snap
 
 Choose how to start and run the Greengrass snap from the options listed below
