@@ -47,11 +47,22 @@ At the end of the process, you should have the config.yaml and a folder containi
 
 ## How is Greengrass config used in Greengrass snap 
 
-### Home dir
-### Snap config from home
+Greengrass config file `config.yaml` from the above section gets used as an initial configuration in this Greengrass snap. 
+See [reference](https://github.com/aws-greengrass/aws-greengrass-snap/blob/main/local-scripts/exec-loader.sh#L17-L18).
+This initial configuration is the file path to Greengrass `config.yaml` file from previous section. 
+And it can be set via `snap configuration` options (`greengrass-config`) offered by the Greengrass snap. 
+There are many ways to provide the Greengrass `config.yaml` file to Greengrass snap. Two such options are captured below. 
+Choose either option to set the `greengrass-config` snap configuration option.   
 
-The goal is to create a config.yaml file with the device details from the above steps.
-* **Note:** Edit the `rootpath` in the config file to point to the root path inside the snap. In this case it would be `"/var/snap/aws-iot-greengrass-v2/current/greengrass/v2"`
+**Note**: On ubuntu core systems where everything needs to be a snap, you can only use the second option - building the `gg-config` snap to support Greengrass snap.
+
+
+### 1. Set `greengrass-config` snap configuration option with file path under $HOME dir
+If you have access to the user's $HOME dir, you can use this method to save `config.yaml` file under $HOME dir and specify the file path directly while setting `greengrass-config` snap configuration option.
+
+* From the previous section, copy over `config.yaml` to the user's $HOME directory.
+* Note `device.pem.crt` , `private.pem.key` and `AmazonRootCA1.pem` must also be saved under the $HOME dir.
+* Edit the `rootpath` in the config file to point to the root path inside the snap. In this case it would be `"/var/snap/aws-iot-greengrass-v2/current/greengrass/v2"` . You should've already made this change in the previous section.
 * Replace `certificateFilePath`, `privateKeyPath` and `rootCaPath` with their respective paths under `$HOME` dir.
 * your config should look like so
   ```
@@ -73,18 +84,23 @@ The goal is to create a config.yaml file with the device details from the above 
               iotCredEndpoint: "device-credentials-prefix.credentials.iot.us-west-2.amazonaws.com"
   ```
 
-Once you have this config.yaml created on your device, copy the file to the user's home directory.
-You can then set the snap configuration with
-
-```
-sudo snap set aws-iot-greengrass-v2 greengrass-config=$HOME/config.yaml
-```
+Note the file path to `config.yaml`. In this case it should be `$HOME/config.yaml`. We will use this in later sections to set the snap configuration option.
 
 
-### content interface snap
+
+### 2. Set `greengrass-config` snap configuration option using content interface
+
+On ubuntu core systems where everything needs to be a snap, you can only use this option. 
+With this approach, you will first build a producer snap (`gg-config`) that provides the greengrass `config.yaml`and device files via a `content interface` slot. 
+You will then connect the `content interface` plug from Greengrass snap to this `gg-config` snap. Once the interface is connected, files from `gg-config` snap will be available in Greengrass snap under a `target path`.
+
+Instructions to build the Content interface producer snap (`gg-config`) are under [the examples folder](examples/README.md).
+At the end of the process, you should have a `gg-config` snap installed with the right set of `config.yaml` and device certs. 
 
 
 ## Building the Greengrass Snap
+
+Now that Greengrass device is provisioned and `config.yaml` ready for consumption, let's build the Greengrass snap. 
 
 We had trouble using the `snapcraft` command on our aws virtual
 computers due to nested virtualization. If you run into problems,
@@ -119,14 +135,8 @@ You should now see it when you run `snap list`
 ubuntu@ip-172-31-47-151:~/greengrass-snap/test$ snap list
 Name                   Version           Rev    Tracking         Publisher   Notes
 amazon-ssm-agent       3.0.1124.0        4046   latest/stable/…  aws✓        classic
-aws-iot-greengrass-v2  2.4.0             x7     -                -           devmode
-core18                 20210611          2074   latest/stable    canonical✓  base
-core20                 20210702          1081   latest/stable    canonical✓  base
-lxd                    4.0.7             21029  4.0/stable/…     canonical✓  -
-multipass              1.7.0             5087   latest/stable    canonical✓  -
-snapcraft              4.8.3             6596   latest/stable    canonical✓  classic
-snapd                  2.51.3            12704  latest/stable    canonical✓  snapd
-snappy-debug           0.36-snapd2.49.1  534    latest/stable    canonical✓  -
+aws-iot-greengrass-v2  2.4.0             x7     -                -           -
+...
 ```
 
 ## Running the Greengrass Snap
@@ -147,17 +157,28 @@ sudo snap connect aws-iot-greengrass-v2:docker-cli docker:docker-daemon
 sudo snap connect aws-iot-greengrass-v2:root-dot-docker :personal-files
 ```
 
-For the Greengrass snap to read the config file, connect the greengrass-config content interface.
-Before connecting this interface, make sure you have build the `gg-config` snap as described in [Build greengrass config snap content interface](#building-the-snap)
-```
-sudo snap connect aws-iot-greengrass-v2:greengrass-config gg-config:greengrass-config
-```
+For the Greengrass snap to read the config file, connect the right interface that will allow access to greengrass `config.yaml` file.  
+Choose one of the options bellow:
 
-OR 
+1. If in the [above greengrass config](#how-is-greengrass-config-used-in-greengrass-snap) section you chose [option 1](#1-set-greengrass-config-snap-configuration-option-with-file-path-under-home-dir), connect the home interface
+    ```
+    sudo snap connect aws-iot-greengrass-v2:home-for-greengrass
+    ```
+    
+    Now that all the interfaces are connected, set the `greengrass-config` configuration option. In this case, it is the `config.yaml` filepath under $HOME dir.
+    ```
+    sudo snap set aws-iot-greengrass-v2 greengrass-config=$HOME/config.yaml
+    ```
 
-```
-sudo snap set aws-iot-greengrass-v2 greengrass-config=$HOME/config.yaml
-```
+2. OR if you chose [option 2](#2-set-greengrass-config-snap-configuration-option-using-content-interface), connect the `greengrass-config-content` interface
+    ```
+    sudo snap connect aws-iot-greengrass-v2:greengrass-config-content gg-config:greengrass-config-content
+    ```
+    
+    Now set the `greengrass-config` configuration option. In this case, it is the `config.yaml` filepath under the content interface's `target path` of Greengrass snap.
+    ```
+    sudo snap set aws-iot-greengrass-v2 greengrass-config=/var/snap/aws-iot-greengrass-v2/current/greengrass/v2/shared-files/config.yaml
+    ```
 
 ### Start the snap
 
