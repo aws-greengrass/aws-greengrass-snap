@@ -14,9 +14,9 @@ parts:
     source: local-files
 
 slots:
-  greengrass-config:
+  greengrass-config-content:
     interface: content
-    content: greengrass-config
+    content: greengrass-config-content
     source: 
       read: 
          - $SNAP/shared-files
