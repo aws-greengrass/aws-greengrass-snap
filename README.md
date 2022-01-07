@@ -43,7 +43,7 @@ Follow these steps from AWS Greengrass docs:
                 iotCredEndpoint: "device-credentials-prefix.credentials.iot.us-west-2.amazonaws.com"
     ```
 
-At the end of the process, you should have the config.yaml and a folder containing device certs. See [example folder here](https://github.com/aws-greengrass/aws-greengrass-snap/examples/gg-config/local-files/shared-files)
+At the end of the process, you should have the config.yaml and a folder containing device certs. See [example folder here](examples/gg-config/local-files/shared-files)
 
 ## How is Greengrass config used in Greengrass snap 
 
