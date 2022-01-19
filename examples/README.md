@@ -52,7 +52,7 @@ This should result in the `aws-greengrass-config` snap with a name similar to `a
 This snap should be installed in 
 [`strict` confinement](https://snapcraft.io/docs/snap-confinement).
 * For `strict` confinement, run
-```sh
+```
 sudo snap install aws-greengrass-config.1.0_amd64.snap --dangerous
 ```
 
@@ -60,7 +60,7 @@ sudo snap install aws-greengrass-config.1.0_amd64.snap --dangerous
 created earlier.
 
 You should now see it when you run `snap list`
-```sh
+```
 ubuntu@ip-172-31-47-151:~/greengrass-snap/test$ snap list
 Name                   Version           Rev    Tracking         Publisher   Notes
 amazon-ssm-agent       3.0.1124.0        4046   latest/stable/…  aws✓        classic
