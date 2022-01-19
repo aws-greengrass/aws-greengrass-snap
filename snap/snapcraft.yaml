@@ -28,7 +28,7 @@ plugs:
     interface: personal-files
     write:
     - $HOME/.docker
-  # declare greengrass-config-content content interface plug to allow access to files from `gg-config` snap.
+  # declare greengrass-config-content content interface plug to allow access to files from `aws-greengrass-config` snap.
   # The next three lines are needed if setting the snap configuration with the use of content interfaces.
   greengrass-config-content:
     interface: content

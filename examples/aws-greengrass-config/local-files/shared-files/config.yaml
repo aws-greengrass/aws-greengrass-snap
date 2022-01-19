@@ -1,8 +1,8 @@
 ---
 system:
-  certificateFilePath: "/var/snap/aws-iot-greengrass-v2/current/greengrass/v2/shared-files/gg-certs/device.pem.crt" # absolute path as path relative to this config.yaml file did not work 
-  privateKeyPath: "/var/snap/aws-iot-greengrass-v2/current/greengrass/v2/shared-files/gg-certs/private.pem.key"
-  rootCaPath: "/var/snap/aws-iot-greengrass-v2/current/greengrass/v2/shared-files/gg-certs/AmazonRootCA1.pem"
+  certificateFilePath: "/var/snap/aws-iot-greengrass-v2/current/greengrass/v2/shared-files/device.pem.crt" # absolute path as path relative to this config.yaml file did not work
+  privateKeyPath: "/var/snap/aws-iot-greengrass-v2/current/greengrass/v2/shared-files/private.pem.key"
+  rootCaPath: "/var/snap/aws-iot-greengrass-v2/current/greengrass/v2/shared-files/AmazonRootCA1.pem"
   rootpath: "/var/snap/aws-iot-greengrass-v2/current/greengrass/v2"
   thingName: "MyGGCoreCIS"
 services:
