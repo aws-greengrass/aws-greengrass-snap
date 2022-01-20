@@ -5,4 +5,6 @@
 
 # Set default value for greengrass config.
 # For now, it doesn't matter if this is invalid as user will provide config during setup
-snapctl set greengrass-config="$HOME/defaultconfig.yaml"
+#
+# See https://github.com/aws-greengrass/aws-greengrass-snap/issues/12
+#snapctl set greengrass-config="$HOME/defaultconfig.yaml"
