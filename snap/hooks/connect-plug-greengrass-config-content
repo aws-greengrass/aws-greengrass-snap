@@ -1,0 +1,17 @@
+#!/bin/bash -ex
+
+# This hook checks for the existence of a config file in the provider snap.
+# If found, its used to set the greengrass-config option, otherwise the
+# config-watcher service is enabled and started.
+
+CONFIG="$SNAP_DATA/greengrass/v2/shared-files/config.yaml"
+
+if [ -e "$CONFIG" ]; then
+    logger "gg:connect-plug-gg-content: setting greengrass-config=$CONFIG"
+    snapctl set greengrass-config="$CONFIG"
+    $SNAP/snap/hooks/configure
+else
+    logger "gg:connect-plug-gg-content: no config file found; starting JITP"
+    snapctl start --enable aws-iot-greengrass-v2.jitp-watcher
+fi
+

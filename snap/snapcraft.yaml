@@ -102,3 +102,7 @@ apps:
       - root-dot-docker
       - home-for-greengrass
       - greengrass-config-content
+  jitp-watcher:
+    command: wait-for-config.sh
+    daemon: oneshot
+    install-mode: disable
