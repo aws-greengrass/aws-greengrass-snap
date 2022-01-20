@@ -3,7 +3,7 @@
 ## Overview
 
 AWS IoT Greengrass snap 2.x enables you to run a limited version of AWS IoT Greengrass through convenient software packages, along with all necessary dependencies, in a containerized environment.
-You can use the Snapcraft.yaml file in this package to build a snap that runs on x86_64 platforms.
+You can use the snapcraft.yaml file in this package to build a snap that runs on x86_64 platforms.
 
 ## Pre-requisite - Manually provision a Greengrass device 
 
