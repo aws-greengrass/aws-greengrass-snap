@@ -10,8 +10,10 @@ description: |
 grade: devel # must be 'stable' to release into candidate/stable channels
 confinement: strict
 
-# declare home plug to allow access to files owned by the user in the user’s home ($HOME) directory
+
 plugs:
+  # declare home plug to allow access to files owned by the user in the user’s home ($HOME) directory
+  # The next three lines are needed if setting the snap configuration from $HOME dir without the use of content interfaces.
   home-for-greengrass:
     interface: home
     read: all
@@ -26,6 +28,12 @@ plugs:
     interface: personal-files
     write:
     - $HOME/.docker
+  # declare greengrass-config-content content interface plug to allow access to files from `aws-greengrass-config` snap.
+  # The next three lines are needed if setting the snap configuration with the use of content interfaces.
+  greengrass-config-content:
+    interface: content
+    content: greengrass-config-content
+    target: $SNAP_DATA/greengrass/v2
 
 parts:
   greengrass:
@@ -89,7 +97,8 @@ apps:
       - process-control
       - hardware-observe
       - log-observe
-      - home-for-greengrass
       - docker-cli
       - docker-executables
       - root-dot-docker
+      - home-for-greengrass
+      - greengrass-config-content
