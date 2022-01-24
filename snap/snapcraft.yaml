@@ -1,13 +1,13 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-name: aws-iot-greengrass-v2
+name: grainger-aws-iot-greengrass-v2
 base: core20
 version: '2.4.0'
 summary: AWS supported software that extends cloud capabilities to local devices.
 description: |
   AWS supported software that extends cloud capabilities to local devices.
-grade: devel # must be 'stable' to release into candidate/stable channels
+grade: stable # must be 'stable' to release into candidate/stable channels
 confinement: strict
 
 
