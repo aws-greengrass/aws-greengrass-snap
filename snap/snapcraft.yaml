@@ -51,10 +51,21 @@ parts:
       OPENJDK_DIR_SYMLINK="java-8-openjdk-arch-symlink"
 
       case $(arch) in
-              x86_64)
-              OPENJDK_DIR="java-8-openjdk-amd64"
-              ;;
+          x86_64)
+            OPENJDK_DIR="java-8-openjdk-amd64"
+            ;;
+          aarch64)
+            OPENJDK_DIR="java-8-openjdk-arm64"
+            ;;
+          armv7l)
+            OPENJDK_DIR="java-8-openjdk-armhf"
+            ;;
+          *)
+            echo "arch $(arch) not supported"
+            exit 3
+            ;;q
       esac
+
 
       ln -s "$OPENJDK_DIR" "$OPENJDK_DIR_SYMLINK" || \
       (echo "failed to link $OPENJDK_DIR_SYMLINK -> $OPENJDK_DIR" \
