@@ -56,7 +56,7 @@ This snap should be installed in
 sudo snap install aws-greengrass-config.1.0_amd64.snap --dangerous
 ```
 
-`gg-aws-greengrass-config.1.0_amd64.snap` is supposed to be the file name of the snap you
+`gg-aws-greengrass-config_1.0_amd64.snap` is supposed to be the file name of the snap you
 created earlier.
 
 You should now see it when you run `snap list`
