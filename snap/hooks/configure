@@ -1,15 +1,18 @@
-#!/bin/bash
+#!/bin/bash -ex
 
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-validate_greengrass_config() {
-  greengrass_config="$(snapctl get greengrass-config)"
+greengrass_config="$(snapctl get greengrass-config)"
+logger "aws-iot-greengrass::configure: validating config file: $greengrass_config"
 
-  # TODO: Add correct validation for config file
-  if [ -z "$greengrass_config" ]; then
-    echo "\"$greengrass_config\" is not a valid Greengrass config" >&2
-    return 1
-  fi
-}
-validate_greengrass_config
+# TODO: Add correct validation for config file
+# Note - the current check only validates that a config file path has
+# been specified, which is not considered an 'error', so 'exit 0' is
+# used. Future validation logic should a non-zero exit code if a config
+# file has been specifed which is not valid (e.g. a malformed file).
+if [ -z "$greengrass_config" ]; then
+  echo "\"$greengrass_config\" is not a valid Greengrass config" >&2
+  exit 0
+fi
+

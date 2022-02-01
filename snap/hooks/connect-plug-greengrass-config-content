@@ -1,0 +1,17 @@
+#!/bin/bash -ex
+
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+# This hook checks for the existence of a config file in the provider snap.
+# If found, it's used to set the greengrass-config option.
+
+CONFIG="$SNAP_DATA/greengrass/v2/shared-files/config.yaml"
+
+if [ -e "$CONFIG" ]; then
+    logger "gg:connect-plug-gg-content: setting greengrass-config=$CONFIG"
+    # Trigger the configure hook
+    snapctl set greengrass-config="$CONFIG"
+else
+    logger "gg:connect-plug-gg-content: no config file found"
+fi
