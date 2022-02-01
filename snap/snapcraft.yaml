@@ -58,21 +58,8 @@ parts:
       # This will be a symlink to the arch-specific openjdk directory.
       OPENJDK_DIR_SYMLINK="java-8-openjdk-arch-symlink"
 
-      case $(arch) in
-            x86_64)
-              OPENJDK_DIR="java-8-openjdk-amd64"
-              ;;
-            aarch64)
-              OPENJDK_DIR="java-8-openjdk-arm64"
-              ;;
-            armv7l)
-              OPENJDK_DIR="java-8-openjdk-armhf"
-              ;;
-            *)
-              echo "arch $(arch) not supported"
-              exit 3
-              ;;
-      esac
+      # Suffix jdk dir with target architecture (amd64/arm64/armhf)
+      OPENJDK_DIR="java-8-openjdk-$SNAPCRAFT_TARGET_ARCH"
 
       ln -s "$OPENJDK_DIR" "$OPENJDK_DIR_SYMLINK" || \
       (echo "failed to link $OPENJDK_DIR_SYMLINK -> $OPENJDK_DIR" \
