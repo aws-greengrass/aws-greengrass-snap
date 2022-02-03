@@ -10,7 +10,8 @@ CONFIG="$SNAP_DATA/greengrass/v2/shared-files/config.yaml"
 
 if [ -e "$CONFIG" ]; then
     logger "gg:connect-plug-gg-content: setting greengrass-config=$CONFIG"
-    # Trigger the configure hook
+    # Setting snap configurations via snapctl tool does NOT trigger the configure hook
+    # https://snapcraft.io/docs/using-snapctl#heading--configuration-options
     snapctl set greengrass-config="$CONFIG"
 else
     logger "gg:connect-plug-gg-content: no config file found"
