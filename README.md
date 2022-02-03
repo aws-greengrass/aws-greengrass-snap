@@ -119,14 +119,18 @@ See https://snapcraft.io/docs/installing-snapd.
 
 Dump this package onto your machine and `cd` into it.
 
-Run `snapcraft`. This should generate the greengrass snap, you should see a snap appear in the package named something like
+You can read about [building your snaps.](https://snapcraft.io/docs/snapcraft-overview#heading--building-your-snap)
+We recommend building snaps using `--use-lxd` on Ubuntu. Be sure to [install and initialize LXD](https://snapcraft.io/docs/build-on-lxd) first.  
+Build the `aws-iot-greengrass` snap with
+```
+snapcraft --use-lxd 
+```
+This should generate the greengrass snap, you should see a snap appear in the package named something like
 `aws-iot-greengrass-v2_2.4.0_amd64.snap`.
 
 ## Installing the Greengrass Snap 
 
-You can install the snap under
-[`strict` confinement](https://snapcraft.io/docs/snap-confinement).
-* For `strict` confinement, run
+Install this snap with following command. Note the `--dangerous` flag is needed as it allows an [unsigned snap to be installed](https://snapcraft.io/docs/install-modes#heading--dangerous) (aka side-loaded).
 ```
 sudo snap install aws-iot-greengrass-v2_2.4.0_amd64.snap --dangerous
 ```

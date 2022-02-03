@@ -39,19 +39,18 @@ services:
       iotCredEndpoint: "cfm5sae6kdtaf.credentials.iot.us-west-2.amazonaws.com"
 
 ```
-
-Now build the `aws-greengrass-config` snap with 
+You can read about [building your snaps.](https://snapcraft.io/docs/snapcraft-overview#heading--building-your-snap)
+We recommend building snaps using `--use-lxd` on Ubuntu. Be sure to [install and initialize LXD](https://snapcraft.io/docs/build-on-lxd) first.   
+Build the `aws-greengrass-config` snap with 
 ```
-snapcraft 
+snapcraft --use-lxd 
 ```
 **Note**: you must be in the `aws-greengrass-config` folder to run the above command.  
 This should result in the `aws-greengrass-config` snap with a name similar to `aws-greengrass-config_1.0_amd64.snap`.
 
 ## Installing the `aws-greengrass-config` snap
 
-This snap should be installed in 
-[`strict` confinement](https://snapcraft.io/docs/snap-confinement).
-* For `strict` confinement, run
+Install this snap with following command. Note the `--dangerous` flag is needed as it allows an [unsigned snap to be installed](https://snapcraft.io/docs/install-modes#heading--dangerous) (aka side-loaded).
 ```
 sudo snap install aws-greengrass-config.1.0_amd64.snap --dangerous
 ```
