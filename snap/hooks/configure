@@ -16,3 +16,16 @@ if [ -z "$greengrass_config" ]; then
   exit 0
 fi
 
+# valid config and install has not been run
+if [ ! -e "$SNAP_DATA/current/greengrass/v2" ]; then
+    logger "aws-iot-greengrass::configure: running install"
+    cd "$SNAP_DATA" || exit 1
+    mkdir -p "$SNAP_DATA/greengrass/v2" || exit 2
+
+    java -Droot="$SNAP_DATA/greengrass/v2" -Dlog.store=FILE -jar "$SNAP/lib/Greengrass.jar" \
+      --start false --init-config "$greengrass_config" --component-default-user root:root || exit 3
+
+    # TODO: rename greengrass to nucleus
+    logger "aws-iot-greengrass::configure: enabling/starting nucleus!"
+    snapctl start --enable aws-iot-greengrass-v2.greengrass
+fi
