@@ -101,3 +101,8 @@ apps:
       - greengrass-config-content
     environment:
       path: "$SNAP/docker-env/usr/sbin:$SNAP/docker-env/usr/bin:$SNAP/docker-env/sbin:$SNAP/docker-env/bin:$PATH"
+      
+hooks:
+  configure:
+    plugs:
+      - home-for-greengrass
