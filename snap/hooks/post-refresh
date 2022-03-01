@@ -13,27 +13,18 @@ logger "aws-iot-greengrass::configure: validating config file: $greengrass_confi
 # file has been specified which is not valid (e.g. a malformed file).
 if [ -z "$greengrass_config" ]; then
   echo "\"$greengrass_config\" is not a valid Greengrass config" >&2
-#  exit 0
+  exit 0 # Fail refresh if greengrass config is invalid
 fi
 
-# valid config and install has not been run
-#if [ ! -e "$SNAP_DATA/current/greengrass/v2" ]; then
 logger "aws-iot-greengrass::post-refresh: re-running installer"
 cd "$SNAP_DATA" || exit 1
-#    mkdir -p "$SNAP_DATA/greengrass/v2" || exit 2
 
 GG_ROOT="$SNAP_DATA/greengrass/v2"
 
 java -Droot="$GG_ROOT" -Dlog.store=FILE -jar "$SNAP/lib/Greengrass.jar" \
-  --start false --component-default-user root:root || exit 3
+  --start false --component-default-user root:root || exit 2
 #--init-config "$greengrass_config" shouldn't need init config
-
-# symlink distro
-ln -s "$GG_ROOT/packages/artifacts-unarchived/aws.greengrass.Nucleus/2.5.3/aws.greengrass.nucleus" "$GG_ROOT/alts/current/distro"
 
 # TODO: rename greengrass to nucleus
 logger "aws-iot-greengrass::post-refresh: enabling/starting nucleus!"
 snapctl start --enable aws-iot-greengrass-v2.greengrass
-#fi
-
-## change the distro symlink to new version
