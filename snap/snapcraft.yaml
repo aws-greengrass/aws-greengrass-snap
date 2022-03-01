@@ -10,7 +10,6 @@ description: |
 grade: devel # must be 'stable' to release into candidate/stable channels
 confinement: strict
 
-
 plugs:
   # declare home plug to allow access to files owned by the user in the user’s home ($HOME) directory
   # The next three lines are needed if setting the snap configuration from $HOME dir without the use of content interfaces.
@@ -79,6 +78,7 @@ parts:
               || exit 6
   wrapper-scripts:
     plugin: dump
+    stage-packages: [inotify-tools]
     source: local-scripts/
 
 layout:
@@ -103,6 +103,8 @@ apps:
       - home-for-greengrass
       - greengrass-config-content
   jitp-watcher:
-    command: wait-for-config.sh
+    command: jitp-wrapper.sh
     daemon: oneshot
     install-mode: disable
+  jitp-watcher-cli:
+    command: jitp-wrapper.sh
