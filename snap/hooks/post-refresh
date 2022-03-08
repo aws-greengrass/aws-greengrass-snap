@@ -13,9 +13,12 @@ logger "aws-iot-greengrass::configure: validating config file: $greengrass_confi
 # file has been specified which is not valid (e.g. a malformed file).
 if [ -z "$greengrass_config" ]; then
   echo "\"$greengrass_config\" is not a valid Greengrass config" >&2
-  exit 0 # Fail refresh if greengrass config is invalid
+  exit 0
 fi
 
+# A greengrass_config is available.
+# We assume that the configure hook ran and Greengrass root was setup successfully in the past.
+# re-run the installer.
 logger "aws-iot-greengrass::post-refresh: re-running installer"
 cd "$SNAP_DATA" || exit 1
 
@@ -25,6 +28,4 @@ java -Droot="$GG_ROOT" -Dlog.store=FILE -jar "$SNAP/lib/Greengrass.jar" \
   --start false --component-default-user root:root || exit 2
 #--init-config "$greengrass_config" shouldn't need init config
 
-# TODO: rename greengrass to nucleus
-logger "aws-iot-greengrass::post-refresh: enabling/starting nucleus!"
-snapctl start --enable aws-iot-greengrass-v2.greengrass
+logger "aws-iot-greengrass::post-refresh: end of post-refresh hook!"

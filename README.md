@@ -190,7 +190,7 @@ Choose one of the options bellow:
 
 ### Start the snap
 
-With the addition configure-hook, setting `greengrass-config` configuration option will trigger the configure hook which in turn starts up the greengrass service. So Greengrass Nucleus should already be up and running at this point. 
+The snap will automatically start/enable the greengrass service (aka the Nucleus) when provided with a valid config.yaml file via the greengrass-config option.
 
 Confirm that the greengrass service is active with `snap services aws-iot-greengrass-v2`
 ```
