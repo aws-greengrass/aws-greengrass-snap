@@ -99,3 +99,10 @@ apps:
       - root-dot-docker
       - home-for-greengrass
       - greengrass-config-content
+    environment:
+      PATH: "$PATH:$SNAP/docker-env/bin"
+      
+hooks:
+  configure:
+    plugs:
+      - home-for-greengrass

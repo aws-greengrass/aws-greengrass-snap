@@ -27,5 +27,5 @@ if [ ! -e "$SNAP_DATA/current/greengrass/v2" ]; then
 
     # TODO: rename greengrass to nucleus
     logger "aws-iot-greengrass::configure: enabling/starting nucleus!"
-    snapctl start --enable aws-iot-greengrass-v2.greengrass
+    snapctl start --enable $SNAP_NAME.greengrass
 fi
