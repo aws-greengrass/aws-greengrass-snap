@@ -12,7 +12,7 @@ logger "aws-iot-greengrass::configure: validating config file: $greengrass_confi
 # used. Future validation logic should a non-zero exit code if a config
 # file has been specified which is not valid (e.g. a malformed file).
 if [ -z "$greengrass_config" ]; then
-  logger "aws-iot-greengrass::configure: \"$greengrass_config\" is not a valid Greengrass config" >&2
+  logger "aws-iot-greengrass::configure: \"$greengrass_config\" is not a valid Greengrass config"
   exit 0
 fi
 
