@@ -5,10 +5,10 @@
 
 logger "aws-iot-greengrass::post-refresh: validating Greengrass root setup"
 
-# Note - the current check validates that the Greengrass root was setup correctly at "$SNAP_DATA/current/greengrass/v2"
+# Note - the current check validates that the Greengrass root was setup correctly at "$SNAP_DATA/greengrass/v2"
 # if it's not present, exit with 'exit 0' is used. There is nothing more to do.
-if [ ! -e "$SNAP_DATA/current/greengrass/v2" ]; then
-  echo "Greengrass root is not valid" >&2
+if [ ! -e "$SNAP_DATA/greengrass/v2" ]; then
+  logger "aws-iot-greengrass::post-refresh: Greengrass root is not valid" >&2
   exit 0
 fi
 
