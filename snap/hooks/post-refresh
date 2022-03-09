@@ -3,29 +3,21 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-greengrass_config="$(snapctl get greengrass-config)"
-logger "aws-iot-greengrass::configure: validating config file: $greengrass_config"
+logger "aws-iot-greengrass::post-refresh: validating Greengrass root setup"
 
-# TODO: Add correct validation for config file
-# Note - the current check only validates that a config file path has
-# been specified, which is not considered an 'error', so 'exit 0' is
-# used. Future validation logic should a non-zero exit code if a config
-# file has been specified which is not valid (e.g. a malformed file).
-if [ -z "$greengrass_config" ]; then
-  echo "\"$greengrass_config\" is not a valid Greengrass config" >&2
+# Note - the current check validates that the Greengrass root was setup correctly at "$SNAP_DATA/current/greengrass/v2"
+# if it's not present, exit with 'exit 0' is used. There is nothing more to do.
+if [ ! -e "$SNAP_DATA/current/greengrass/v2" ]; then
+  echo "Greengrass root is not valid" >&2
   exit 0
 fi
 
-# A greengrass_config is available.
 # We assume that the configure hook ran and Greengrass root was setup successfully in the past.
 # re-run the installer.
 logger "aws-iot-greengrass::post-refresh: re-running installer"
 cd "$SNAP_DATA" || exit 1
 
-GG_ROOT="$SNAP_DATA/greengrass/v2"
-
-java -Droot="$GG_ROOT" -Dlog.store=FILE -jar "$SNAP/lib/Greengrass.jar" \
+java -Droot="$SNAP_DATA/greengrass/v2" -Dlog.store=FILE -jar "$SNAP/lib/Greengrass.jar" \
   --start false --component-default-user root:root || exit 2
-#--init-config "$greengrass_config" shouldn't need init config
 
 logger "aws-iot-greengrass::post-refresh: end of post-refresh hook!"
