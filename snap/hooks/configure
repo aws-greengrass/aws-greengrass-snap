@@ -10,14 +10,14 @@ logger "aws-iot-greengrass::configure: validating config file: $greengrass_confi
 # Note - the current check only validates that a config file path has
 # been specified, which is not considered an 'error', so 'exit 0' is
 # used. Future validation logic should a non-zero exit code if a config
-# file has been specifed which is not valid (e.g. a malformed file).
+# file has been specified which is not valid (e.g. a malformed file).
 if [ -z "$greengrass_config" ]; then
-  echo "\"$greengrass_config\" is not a valid Greengrass config" >&2
+  logger "aws-iot-greengrass::configure: \"$greengrass_config\" is not a valid Greengrass config"
   exit 0
 fi
 
 # valid config and install has not been run
-if [ ! -e "$SNAP_DATA/current/greengrass/v2" ]; then
+if [ ! -e "$SNAP_DATA/greengrass/v2" ]; then
     logger "aws-iot-greengrass::configure: running install"
     cd "$SNAP_DATA" || exit 1
     mkdir -p "$SNAP_DATA/greengrass/v2" || exit 2

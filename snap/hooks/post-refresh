@@ -1,0 +1,23 @@
+#!/bin/bash -ex
+
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+logger "aws-iot-greengrass::post-refresh: validating Greengrass root setup"
+
+# Note - the current check validates that the Greengrass root was setup correctly at "$SNAP_DATA/greengrass/v2"
+# if it's not present, exit with 'exit 0' is used. There is nothing more to do.
+if [ ! -e "$SNAP_DATA/greengrass/v2" ]; then
+  logger "aws-iot-greengrass::post-refresh: Greengrass root is not valid"
+  exit 0
+fi
+
+# We assume that the configure hook ran and Greengrass root was setup successfully in the past.
+# re-run the installer.
+logger "aws-iot-greengrass::post-refresh: re-running installer"
+cd "$SNAP_DATA" || exit 1
+
+java -Droot="$SNAP_DATA/greengrass/v2" -Dlog.store=FILE -jar "$SNAP/lib/Greengrass.jar" \
+  --start false --component-default-user root:root || exit 2
+
+logger "aws-iot-greengrass::post-refresh: end of post-refresh hook!"

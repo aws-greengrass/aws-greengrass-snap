@@ -190,17 +190,7 @@ Choose one of the options bellow:
 
 ### Start the snap
 
-Choose how to start and run the Greengrass snap from the options listed below
-
-* To start the greengrass service in the background, run with:
-  ```
-  sudo snap start aws-iot-greengrass-v2
-  ```
-  This command starts the service in the background, which is why it doesn't log any console output.
-* You can choose to run the service with `--enable` option to enable the automatic starting of a service when the system boots
-  ```
-  sudo snap start --enable aws-iot-greengrass-v2.greengrass
-  ```
+The snap will automatically start/enable the greengrass service (aka the Nucleus) when provided with a valid config.yaml file via the greengrass-config option.
 
 Confirm that the greengrass service is active with `snap services aws-iot-greengrass-v2`
 ```
@@ -210,15 +200,30 @@ aws-iot-greengrass-v2.greengrass  disabled  active  -
 ```
 
 ## Troubleshooting
-If you run into trouble, first ensure that the greengrass service is stopped if currently running. Use `snap stop` to stop the service
-```
-sudo snap stop aws-iot-greengrass-v2.greengrass
-```
-Then run `sudo snap run` to start the service in the foreground.
-```
-sudo snap run aws-iot-greengrass-v2.greengrass
-```
-This command will run greengrass in the foreground allowing you to see console output which may be helpful when troubleshooting.
+
+* If greengrass service is not active or failed to start, you can explicitly start and run the Greengrass snap by picking from the options listed below
+
+  * To start the greengrass service in the background, run with:
+    ```
+    sudo snap start aws-iot-greengrass-v2
+    ```
+    This command starts the service in the background, which is why it doesn't log any console output.
+  * You can choose to run the service with `--enable` option to enable the automatic starting of a service when the system boots
+    ```
+    sudo snap start --enable aws-iot-greengrass-v2.greengrass
+    ```
+
+
+
+* If you run into trouble, first ensure that the greengrass service is stopped if currently running. Use `snap stop` to stop the service
+    ```
+    sudo snap stop aws-iot-greengrass-v2.greengrass
+    ```
+    Then run `sudo snap run` to start the service in the foreground.
+    ```
+    sudo snap run aws-iot-greengrass-v2.greengrass
+    ```
+    This command will run greengrass in the foreground allowing you to see console output which may be helpful when troubleshooting.
 
 ## Removing the Greengrass Snap
 
