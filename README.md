@@ -199,6 +199,36 @@ Service                           Startup   Current   Notes
 aws-iot-greengrass-v2.greengrass  disabled  active  -
 ```
 
+### Create a Greengrass Deployment
+
+It’s time to create a Greengrass deployment to complete the set up of your core
+device. [Greengrass Deployment](https://docs.aws.amazon.com/greengrass/v2/developerguide/create-deployments.html)
+
+* Create a deployment.json file on the development machine. You’ll need the device ARN of the Greengrass core device you
+  created.
+* Here’s a sample deployment.json file.
+  ```json
+  {
+    "targetArn": "arn:aws:iot:us-west-2:<ACCOUNTID>:thing/MyGreengrassCoreSnap",
+     "components": {
+       "aws.greengrass.Nucleus": {
+           "componentVersion": "2.4.0"
+       }
+     }
+  }
+  ```
+* Note: We are pinning the nucleus version in deployment to avoid auto-updates of the nucleus version.
+* There are many configuration options for a deployment. Some of them captured [here](https://docs.aws.amazon.com/greengrass/v2/developerguide/create-deployments.html)
+* Create the deployment using the aws cli. The response should give you a deployment-id which can be tracked on the Greengrass console.
+  ```
+   aws greengrassv2 create-deployment \
+   --cli-input-json file://deployment.json
+  ```
+* Check the Greengrass console to see if the deployment is successful. When it is `Completed` you can see your core device and verify that it is running the expected version of Greengrass.
+* If there are errors in the deployment, sudo into your device and analyze the greengrass logs. The
+  logs are at `/var/snap/aws-iot-greengrass-v2/current/greengrass/v2/logs`. Greengrass logs are in `greengrass.log`. Component
+  logs can also be found in the same `logs` dir.
+
 ## Troubleshooting
 
 * If greengrass service is not active or failed to start, you can explicitly start and run the Greengrass snap by picking from the options listed below
