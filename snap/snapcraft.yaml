@@ -77,6 +77,7 @@ parts:
   wrapper-scripts:
     plugin: dump
     source: local-scripts/
+    stage-packages: [inotify-tools]
 
 layout:
   # symlink java
@@ -101,7 +102,11 @@ apps:
       - greengrass-config-content
     environment:
       PATH: "$PATH:$SNAP/docker-env/bin"
-      
+  jitp-watcher:
+    command: wait-for-config.sh
+    daemon: simple
+    install-mode: disable
+
 hooks:
   configure:
     plugs:

@@ -94,7 +94,11 @@ On Ubuntu Core systems, which may not have a user account enabled, this may be t
 
 With this approach, you will first build a producer snap (e.g. `aws-greengrass-config`) that provides the greengrass `config.yaml`and device files via a `content` interface slot. 
 You will then connect the `content` interface plug from Greengrass snap to the producer snap's `content` interface slot. Once the interface is connected, 
-files from producer snap will be available in Greengrass snap at the `target path` defined by the Greengrass snap's `content` interface plug.
+files from producer snap will be available in Greengrass snap at the `target path` defined by the Greengrass snap's `content` interface plug. If a
+`config.yaml` file exists in the directory shared by the producer snap's `content` interface slot, the snap will automatically set the
+`greengrass-config` option to the path of this file. If `config.yaml` does not exist, the snap will start a service called `jitp-watcher`,
+which uses the `inotifywait` command to monitor the directory for the file `config.yaml` to be moved or created, setting the `greengrass-config`
+option when this occurs. Please note, the device files referenced by `config.yaml` should be moved/created in the directory *before* `config.yaml`.
 
 **Note**: `aws-greengrass-config` is an example snap name that can be modified. 
 
