@@ -5,9 +5,15 @@
 
 logger "aws-iot-greengrass::post-refresh: validating Greengrass root setup"
 
-# Note - the current check validates that the Greengrass root was setup correctly at "$SNAP_DATA/greengrass/v2"
-# if it's not present, exit with 'exit 0' is used. There is nothing more to do.
-if [ ! -e "$SNAP_DATA/greengrass/v2" ]; then
+# Check for existence of the IPC socket to determine
+# if greengrass has been installed; GG_ROOT cannot
+# be used for this as the config content interface
+# uses `$SNAP_DATA/greengrass/v2/shared-files` for a
+# target, so GG_ROOT could exist even though the
+# installer has not yet been run. If the socket doesn't
+# exist, then there's nothing more to do as greengrass
+# hasn't yet been 'installed'.
+if [ ! -e "$SNAP_DATA/greengrass/v2/ipc.socket" ]; then
   logger "aws-iot-greengrass::post-refresh: Greengrass root is not valid"
   exit 0
 fi
