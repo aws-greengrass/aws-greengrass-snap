@@ -17,8 +17,10 @@ slots:
   greengrass-config-content:
     interface: content
     content: greengrass-config-content
-    source: 
-      read: 
-         - $SNAP/shared-files
+    source:
+      # use write so that config files can be copied into
+      # this directory to demonstrate JITP
+      write:
+         - $SNAP_DATA/shared-files
 
 

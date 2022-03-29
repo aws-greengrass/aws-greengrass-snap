@@ -16,8 +16,13 @@ if [ -z "$greengrass_config" ]; then
   exit 0
 fi
 
-# valid config and install has not been run
-if [ ! -e "$SNAP_DATA/greengrass/v2" ]; then
+# Check for existence of the IPC socket to determine
+# if greengrass has been installed; GG_ROOT cannot
+# be used for this as the config content interface
+# uses `$SNAP_DATA/greengrass/v2/shared-files` for a
+# target, so GG_ROOT could exist even though the
+# installer has not yet been run.
+if [ ! -e "$SNAP_DATA/greengrass/v2/ipc.socket" ]; then
     logger "aws-iot-greengrass::configure: running install"
     cd "$SNAP_DATA" || exit 1
     mkdir -p "$SNAP_DATA/greengrass/v2" || exit 2
@@ -27,5 +32,5 @@ if [ ! -e "$SNAP_DATA/greengrass/v2" ]; then
 
     # TODO: rename greengrass to nucleus
     logger "aws-iot-greengrass::configure: enabling/starting nucleus!"
-    snapctl start --enable $SNAP_NAME.greengrass
+    snapctl start --enable "$SNAP_NAME".greengrass
 fi

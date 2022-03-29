@@ -1,0 +1,16 @@
+#!/bin/bash -ex
+
+SHARED_FILES_DEST="$SNAP_DATA/shared-files"
+SHARED_FILES_SRC="$SNAP/shared-files"
+
+# create $SNAP_DATA/share-filed and populate from $SNAP
+if [ ! -f "$SHARED_FILES_DEST" ]; then
+    mkdir -p "$SHARED_FILES_DEST"
+    cp "$SHARED_FILES_SRC/config.yaml" "$SHARED_FILES_DEST"
+    cp "$SHARED_FILES_SRC/device.pem.crt" "$SHARED_FILES_DEST"
+    cp "$SHARED_FILES_SRC/private.pem.key" "$SHARED_FILES_DEST"
+    cp "$SHARED_FILES_SRC/public.pem.key" "$SHARED_FILES_DEST"
+    cp "$SHARED_FILES_SRC/AmazonRootCA1.pem" "$SHARED_FILES_DEST"
+fi
+
+
