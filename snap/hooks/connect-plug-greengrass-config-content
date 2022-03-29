@@ -16,5 +16,5 @@ if [ -e "$CONFIG" ]; then
     "$SNAP/snap/hooks/configure"
 else
     logger "gg:connect-plug-gg-content: no config file found; starting JITP"
-    snapctl start --enable aws-iot-greengrass-v2.jitp-watcher
+    snapctl start --enable "$SNAP_NAME".jitp-watcher
 fi
