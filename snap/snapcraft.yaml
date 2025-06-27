@@ -3,7 +3,7 @@
 
 name: aws-iot-greengrass-v2
 base: core20
-version: '2.4.0'
+version: '2.14.1'
 summary: AWS supported software that extends cloud capabilities to local devices.
 description: |
   AWS supported software that extends cloud capabilities to local devices.
@@ -31,7 +31,7 @@ parts:
   greengrass:
     # See 'snapcraft plugins'
     plugin: dump
-    source: https://d2s8p88vqu9w66.cloudfront.net/releases/greengrass-2.4.0.zip
+    source: https://d2s8p88vqu9w66.cloudfront.net/releases/greengrass-2.14.1.zip
     stage-packages:
       - openjdk-8-jre-headless
     build-packages:

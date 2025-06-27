@@ -1,3 +1,4 @@
+
 # AWS IoT Greengrass V2 as a Snap
 
 ## Overview
@@ -10,19 +11,25 @@ AWS IoT Greengrass snap 2.x enables you to run a limited version of AWS IoT Gree
 
 We had trouble using the `snapcraft` command on our aws virtual
 computers due to nested virtualization. If you run into problems,
-we recommend that you copy our environments. We used Ubuntu 18.04+ on the
+we recommend that you copy our environments. We used Ubuntu 24.04. on the
 following ec2 instances:
 * a metal x86 ec2
-    * eg `m5.metal`
+    * eg `c5.metal`
 
 **These odd requirements are just for building the snap**. Once you have the
 snap, you'll just need an OS that supports Snapcraft.
 See https://snapcraft.io/docs/installing-snapd.
 
+```bash
+sudo snap install snapcraft --classic
+```
+
+Reboot - had issues without it generating the snap.
+
 Dump this package onto your machine and `cd` into it.
 
 Run `snapcraft`. This should generate the greengrass snap, you should see a snap appear in the package named something like
-`aws-iot-greengrass-v2_2.4.0_amd64.snap`.
+`aws-iot-greengrass-v2_2.14.1_amd64.snap`.
 
 ### Installing/Running the Snap
 
@@ -31,7 +38,7 @@ Run `snapcraft`. This should generate the greengrass snap, you should see a snap
 You can install the snap under
 [`strict` confinement](https://snapcraft.io/docs/snap-confinement).
 * For `strict` confinement, run
-  `sudo snap install aws-iot-greengrass-v2_2.4.0_amd64.snap --dangerous`.
+  `sudo snap install aws-iot-greengrass-v2_2.14.1_amd64.snap --dangerous`.
 
 `aws-iot-greengrass-v2_*_*.snap` is supposed to be the file name of the snap you
 created earlier.
@@ -41,7 +48,7 @@ You should now see it when you run `snap list`
 ubuntu@ip-172-31-47-151:~/greengrass-snap/test$ snap list
 Name                   Version           Rev    Tracking         Publisher   Notes
 amazon-ssm-agent       3.0.1124.0        4046   latest/stable/…  aws✓        classic
-aws-iot-greengrass-v2  2.4.0             x7     -                -           devmode
+aws-iot-greengrass-v2  2.14.1             x7     -                -           devmode
 core18                 20210611          2074   latest/stable    canonical✓  base
 core20                 20210702          1081   latest/stable    canonical✓  base
 lxd                    4.0.7             21029  4.0/stable/…     canonical✓  -
@@ -58,17 +65,17 @@ First you must complete the following steps from the guide, to be able to provis
 * [Create an AWS IoT thing](https://docs.aws.amazon.com/greengrass/v2/developerguide/manual-installation.html#create-iot-thing)
 * [Retrieve AWS IoT endpoints](https://docs.aws.amazon.com/greengrass/v2/developerguide/manual-installation.html#retrieve-iot-endpoints)
 * [Create a token exchange role](https://docs.aws.amazon.com/greengrass/v2/developerguide/manual-installation.html#create-token-exchange-role)
-* [Download certificates to the device](https://docs.aws.amazon.com/greengrass/v2/developerguide/manual-installation.html#download-thing-certificates) 
+* [Download certificates to the device](https://docs.aws.amazon.com/greengrass/v2/developerguide/manual-installation.html#download-thing-certificates)
   * Under `Download certificates to the device` section, make sure to replace `/greengrass/v2` with a folder in the user's `$HOME` dir. You will later connect the home interface to provide snap access to `$HOME` dir.
 
 
 **Note:**   You will skip `Download the AWS IoT Greengrass Core software` step as this is handled by the Greengrass snap
 
-Continue following the manual provisioning guide 
+Continue following the manual provisioning guide
 * [Install the AWS IoT Greengrass Core software](https://docs.aws.amazon.com/greengrass/v2/developerguide/manual-installation.html#run-greengrass-core-v2-installer-manual)
   * Under this section, you only need to perform `step 2`. The goal is to create a config.yaml file with the device details from the above steps.
-  * **Note:** Edit the `rootpath` in the config file to point to the root path inside the snap. In this case it would be `"/var/snap/aws-iot-greengrass-v2/current/greengrass/v2"` 
-  * Replace `certificateFilePath`, `privateKeyPath` and `rootCaPath` with their respective paths under `$HOME` dir. 
+  * **Note:** Edit the `rootpath` in the config file to point to the root path inside the snap. In this case it would be `"/var/snap/aws-iot-greengrass-v2/current/greengrass/v2"`
+  * Replace `certificateFilePath`, `privateKeyPath` and `rootCaPath` with their respective paths under `$HOME` dir.
   * your config should look like so
     ```
     ---
@@ -81,7 +88,7 @@ Continue following the manual provisioning guide
     services:
         aws.greengrass.Nucleus:
             componentType: "NUCLEUS"
-            version: "2.4.0"
+            version: "2.14.1"
             configuration:
                 awsRegion: "us-west-2"
                 iotRoleAlias: "GreengrassCoreSnapTokenExchangeRoleAlias"
