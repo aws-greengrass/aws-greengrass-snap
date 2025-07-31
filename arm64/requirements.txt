@@ -2,5 +2,4 @@ boto3
 botocore
 requests
 PyYAML
-python3-venv
 awsiotsdk
