@@ -1,5 +1,5 @@
 name: aws-iot-greengrass
-version: '1.0'
+version: '2.14.3'
 summary: AWS IoT Core and Greengrass v2 configurator
 description: A Python application to configure AWS IoT Core things and install Greengrass v2
 
@@ -21,7 +21,7 @@ plugs:
 apps:
   configure:
     command: bin/python3 $SNAP/bin/iot-greengrass-setup.py
-    plugs: 
+    plugs:
       - network
       - network-bind
       - home
