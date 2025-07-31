@@ -1,0 +1,106 @@
+name: Build AWS IoT Greengrass Snap
+
+on:
+  workflow_dispatch:  # Manual trigger only
+  pull_request:       # Automatic trigger on PRs (no artifact upload)
+
+jobs:
+  build-amd64:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install snapcraft
+      run: |
+        sudo snap install snapcraft --classic
+
+    - name: Install necessary tools
+      run: |
+        sudo apt update
+        sudo apt install -y findutils python3-dev python3-venv wget
+
+    - name: Install Docker (required for build)
+      run: |
+        sudo snap install docker
+
+    - name: Setup build directory
+      run: |
+        mkdir -p ~/mysnaps/aws-iot-greengrass
+        cd ~/mysnaps/aws-iot-greengrass
+        snapcraft init
+
+    - name: Copy amd64 files
+      run: |
+        cp -r ./amd64/* ~/mysnaps/aws-iot-greengrass/
+
+    - name: Build snap package
+      run: |
+        cd ~/mysnaps/aws-iot-greengrass
+        chmod +x ./build.sh
+        ./build.sh
+
+    - name: List built packages
+      run: |
+        cd ~/mysnaps/aws-iot-greengrass
+        ls -la *.snap || echo "No snap files found"
+
+    - name: Upload AMD64 snap artifacts
+      if: github.event_name == 'workflow_dispatch'
+      uses: actions/upload-artifact@v4
+      with:
+        name: aws-iot-greengrass-amd64-snap
+        path: ~/mysnaps/aws-iot-greengrass/*.snap
+        retention-days: 7
+        if-no-files-found: warn
+
+  build-arm64:
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install snapcraft
+      run: |
+        sudo snap install snapcraft --classic
+
+    - name: Install necessary tools
+      run: |
+        sudo apt update
+        sudo apt install -y findutils python3-dev python3-venv wget
+
+    - name: Install Docker (required for build)
+      run: |
+        sudo snap install docker
+
+    - name: Setup build directory
+      run: |
+        mkdir -p ~/mysnaps/aws-iot-greengrass
+        cd ~/mysnaps/aws-iot-greengrass
+        snapcraft init
+
+    - name: Copy arm64 files
+      run: |
+        cp -r ./arm64/* ~/mysnaps/aws-iot-greengrass/
+
+    - name: Build snap package
+      run: |
+        cd ~/mysnaps/aws-iot-greengrass
+        chmod +x ./build.sh
+        ./build.sh
+
+    - name: List built packages
+      run: |
+        cd ~/mysnaps/aws-iot-greengrass
+        ls -la *.snap || echo "No snap files found"
+
+    - name: Upload ARM64 snap artifacts
+      if: github.event_name == 'workflow_dispatch'
+      uses: actions/upload-artifact@v4
+      with:
+        name: aws-iot-greengrass-arm64-snap
+        path: ~/mysnaps/aws-iot-greengrass/*.snap
+        retention-days: 7
+        if-no-files-found: warn
