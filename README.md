@@ -7,21 +7,20 @@ These folders contain the Greengrass v2 Nucleus Classic Snap packages for Ubuntu
 
 ## Building the snap
 
-1. Install Snapcraft
+Install Snapcraft
 
-    `sudo snap install snapcraft`
+    sudo snap install snapcraft
 
-2. Create a new folder in your home folder (e.g. `/home/user/mysnaps/aws-iot-greengrass`)
+Create a new folder in your home folder (e.g. `/home/user/mysnaps/aws-iot-greengrass`)
 
-3. Change to the folder you just created and initialize snapcraft
+Change to the folder you just created and initialize snapcraft
 
-    `cd ~/mysnaps/aws-iot-greengrass`
+    cd ~/mysnaps/aws-iot-greengrass
+    snapcraft init
 
-    `snapcraft init`
+Copy all files from this repository to local machine.  The `snapcraft init` command from the previous step creates a default `snapcraft.yaml` file - replace that default file with the one in this repository
 
-4. Copy all files from this repository to local machine.  The `snapcraft init` command from the previous step creates a default `snapcraft.yaml` file - replace that default file with the one in this repository
-
-5. Run the following script to build the new snap;
+Run the following script to build the new snap;
 
     ./build.sh
 
