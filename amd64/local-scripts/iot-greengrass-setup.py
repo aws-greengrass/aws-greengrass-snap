@@ -44,7 +44,7 @@ def create_aws_clients(access_key, secret_key, region):
 
         iot_client = session.client('iot')
         iam_client = session.client('iam')
-        sts_client = boto3.client('sts')
+        sts_client = session.client('sts')
         account_id = sts_client.get_caller_identity()['Account']
 
         return iot_client, iam_client, account_id

@@ -2,7 +2,7 @@
 
 These folders contain the Greengrass v2 Nucleus Classic Snap packages for Ubuntu Core
 
-- arm64 package tested on Raspberry Pi Zero 2W running Ubuntu Core 22 fro Raspberry Pi Imager - To be updated
+- arm64 package tested on Raspberry Pi Zero 2W running Ubuntu Core 22 fro Raspberry Pi Imager
 - amd64 tested on Intel NUC N150 running generic Ubuntu Core 24 image from Canonical
 
 ## Building the snap
@@ -45,7 +45,12 @@ The `sudo aws-iot-greengrass.configure` command prompts for the following inform
 
 The Access Key/Secret Access Key corresponds to an IAM user with sufficient privileges to install and connect an IoT Thing to IoT Core, including provisioning certificates, and creating the Greengrass Core device.  
 
-**NOTE**: This command also assumes that the role alias `GreengrassV2TokenExchangeRoleAlias` already exists and this should refer to a suitable IAM role.
+## NOTES
+
+- The package assumes that the role alias `GreengrassV2TokenExchangeRoleAlias` already exists and this should refer to a suitable IAM role.
+- Docker integration is included so the Docker snap must be installed (`snap install docker`) on the build machine to build successfully.
+- Some Python libraries are included in the snap such as boto3 and awsiotsdk.  Further validation should be done on what should/should not be included
+
 
 
 
