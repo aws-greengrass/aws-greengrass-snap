@@ -16,6 +16,7 @@ These folders contain the Greengrass v2 Nucleus Classic Snap packages for Ubuntu
 3. Change to the folder you just created and initialize snapcraft
 
     `cd ~/mysnaps/aws-iot-greengrass`
+    
     `snapcraft init`
 
 4. Copy all files from this repository to local machine.  The `snapcraft init` command from the previous step creates a default `snapcraft.yaml` file - replace that default file with the one in this repository
