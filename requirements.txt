@@ -1,0 +1,8 @@
+boto3
+botocore
+requests
+PyYAML
+awsiotsdk
+opencv-python-headless
+numpy
+ovmsclient

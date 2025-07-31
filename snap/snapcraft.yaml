@@ -1,95 +1,78 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
+name: aws-iot-greengrass
+version: '1.0'
+summary: AWS IoT Core and Greengrass v2 configurator
+description: A Python application to configure AWS IoT Core things and install Greengrass v2
 
-name: aws-iot-greengrass-v2
-base: core20
-version: '2.14.1'
-summary: AWS supported software that extends cloud capabilities to local devices.
-description: |
-  AWS supported software that extends cloud capabilities to local devices.
-grade: devel # must be 'stable' to release into candidate/stable channels
+base: core24
 confinement: strict
+grade: stable
 
-# declare home plug to allow access to files owned by the user in the user’s home ($HOME) directory
+environment:
+  PATH: $SNAP/docker/bin:$PATH
+  PYTHONPATH: $SNAP/lib/python3.12/site-packages:$PYTHON_PATH
+
 plugs:
-  home-for-greengrass:
-    interface: home
-    read: all
-  docker-cli:
-    interface: docker
   docker-executables:
-    content: docker-executables
-    default-provider: docker
     interface: content
-    target: $SNAP/docker-env
-  root-dot-docker:
-    interface: personal-files
-    write:
-    - $HOME/.docker
-
-parts:
-  greengrass:
-    # See 'snapcraft plugins'
-    plugin: dump
-    source: https://d2s8p88vqu9w66.cloudfront.net/releases/greengrass-2.14.1.zip
-    stage-packages:
-      - openjdk-8-jre-headless
-    build-packages:
-      # We need to replace dangling symlink for java ssl certs.
-      - ca-certificates-java
-    override-build: |
-      # execute default build step
-      snapcraftctl build
-
-      cd "$SNAPCRAFT_PART_INSTALL/usr/lib/jvm" || exit 2
-
-      # The java-8-openjdk-<arch> dir has a different name for each arch, so
-      # we need a symlink that references the actual name.
-      # Described in: https://forum.snapcraft.io/t/advanced-grammar-for-layouts-or-workaround/17177/4
-
-      # This will be a symlink to the arch-specific openjdk directory.
-      OPENJDK_DIR_SYMLINK="java-8-openjdk-arch-symlink"
-
-      case $(arch) in
-              x86_64)
-              OPENJDK_DIR="java-8-openjdk-amd64"
-              ;;
-      esac
-
-      ln -s "$OPENJDK_DIR" "$OPENJDK_DIR_SYMLINK" || \
-      (echo "failed to link $OPENJDK_DIR_SYMLINK -> $OPENJDK_DIR" \
-      && exit 4)
-
-      # The cacerts under /etc won't be accessible after build-time,
-      # so the symlink leading to them will become a dangling symlinnk.
-      # To avoid this, we'll copy them to the java subdirectory.
-      cp /etc/ssl/certs/java/cacerts \
-              "$SNAPCRAFT_PART_INSTALL/usr/lib/jvm/$OPENJDK_DIR_SYMLINK/jre/lib/security/cacerts" \
-              || exit 5
-      cp /etc/ssl/certs/java/cacerts \
-              "$SNAPCRAFT_PART_INSTALL/etc/ssl/certs/java/cacerts" \
-              || exit 6
-  wrapper-scripts:
-    plugin: dump
-    source: local-scripts/
-
-layout:
-  # symlink java
-  /usr/bin/java:
-    symlink: $SNAP/usr/lib/jvm/java-8-openjdk-arch-symlink/jre/bin/java
+    content: docker-executables
+    target: $SNAP/docker
+    default-provider: docker
 
 apps:
-  greengrass:
-    command: exec-loader.sh
-    daemon: simple
-    install-mode: disable
-    plugs:
-      - mount-observe
+  configure:
+    command: bin/python3 $SNAP/bin/iot-greengrass-setup.py
+    plugs: 
+      - network
       - network-bind
-      - process-control
+      - home
+      - system-observe
+      - mount-observe
       - hardware-observe
-      - log-observe
-      - home-for-greengrass
-      - docker-cli
+      - process-control
       - docker-executables
-      - root-dot-docker
+      - docker
+      - camera
+
+  greengrass-daemon:
+    command: bin/greengrass-wrapper.sh
+    daemon: simple
+    restart-condition: always
+    restart-delay: 10s
+    plugs:
+      - network
+      - network-bind
+      - system-observe
+      - mount-observe
+      - hardware-observe
+      - process-control
+      - log-observe
+      - docker-executables
+      - docker
+      - camera
+
+parts:
+  iot-greengrass-app:
+    plugin: python
+    source: .
+    python-requirements:
+      - requirements.txt
+    stage-packages:
+      - openjdk-11-jre-headless
+    build-packages:
+      - wget
+    override-build: |
+      # Run default Python plugin build first
+      craftctl default
+
+      # Create directory and download Greengrass installer
+      mkdir -p $CRAFT_PART_INSTALL/opt/greengrass
+      wget -O $CRAFT_PART_INSTALL/opt/greengrass/greengrass-nucleus.zip \
+        https://d2s8p88vqu9w66.cloudfront.net/releases/greengrass-2.14.3.zip
+
+      # Ensure Python script is executable and in correct location
+      mkdir -p $CRAFT_PART_INSTALL/bin
+      cp local-scripts/iot-greengrass-setup.py $CRAFT_PART_INSTALL/bin/
+      chmod +x $CRAFT_PART_INSTALL/bin/iot-greengrass-setup.py
+
+      cp local-scripts/greengrass-wrapper.sh $CRAFT_PART_INSTALL/bin/
+      chmod +x $CRAFT_PART_INSTALL/bin/greengrass-wrapper.sh
