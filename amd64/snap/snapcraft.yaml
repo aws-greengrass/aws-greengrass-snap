@@ -1,0 +1,78 @@
+name: aws-iot-greengrass
+version: '2.14.3'
+summary: AWS IoT Core and Greengrass v2 configurator
+description: A Python application to configure AWS IoT Core things and install Greengrass v2
+
+base: core24
+confinement: strict
+grade: stable
+
+environment:
+  PATH: $SNAP/docker/bin:$PATH
+  PYTHONPATH: $SNAP/lib/python3.12/site-packages:$PYTHON_PATH
+
+plugs:
+  docker-executables:
+    interface: content
+    content: docker-executables
+    target: $SNAP/docker
+    default-provider: docker
+
+apps:
+  configure:
+    command: bin/python3 $SNAP/bin/iot-greengrass-setup.py
+    plugs:
+      - network
+      - network-bind
+      - home
+      - system-observe
+      - mount-observe
+      - hardware-observe
+      - process-control
+      - docker-executables
+      - docker
+      - camera
+
+  greengrass-daemon:
+    command: bin/greengrass-wrapper.sh
+    daemon: simple
+    restart-condition: always
+    restart-delay: 10s
+    plugs:
+      - network
+      - network-bind
+      - system-observe
+      - mount-observe
+      - hardware-observe
+      - process-control
+      - log-observe
+      - docker-executables
+      - docker
+      - camera
+
+parts:
+  iot-greengrass-app:
+    plugin: python
+    source: .
+    python-requirements:
+      - requirements.txt
+    stage-packages:
+      - openjdk-11-jre-headless
+    build-packages:
+      - wget
+    override-build: |
+      # Run default Python plugin build first
+      craftctl default
+
+      # Create directory and download Greengrass installer
+      mkdir -p $CRAFT_PART_INSTALL/opt/greengrass
+      wget -O $CRAFT_PART_INSTALL/opt/greengrass/greengrass-nucleus.zip \
+        https://d2s8p88vqu9w66.cloudfront.net/releases/greengrass-2.14.3.zip
+
+      # Ensure Python script is executable and in correct location
+      mkdir -p $CRAFT_PART_INSTALL/bin
+      cp local-scripts/iot-greengrass-setup.py $CRAFT_PART_INSTALL/bin/
+      chmod +x $CRAFT_PART_INSTALL/bin/iot-greengrass-setup.py
+
+      cp local-scripts/greengrass-wrapper.sh $CRAFT_PART_INSTALL/bin/
+      chmod +x $CRAFT_PART_INSTALL/bin/greengrass-wrapper.sh
