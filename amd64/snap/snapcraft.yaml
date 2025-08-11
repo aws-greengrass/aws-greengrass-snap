@@ -60,6 +60,13 @@ parts:
       - openjdk-11-jre-headless
     build-packages:
       - wget
+    override-stage: |
+      craftctl default
+      # Fix Java security symlinks
+      rm -f $CRAFT_STAGE/usr/lib/jvm/java-11-openjdk-amd64/lib/security/blacklisted.certs
+      rm -f $CRAFT_STAGE/usr/lib/jvm/java-11-openjdk-amd64/lib/security/cacerts
+      cp /etc/java-11-openjdk/security/blacklisted.certs $CRAFT_STAGE/usr/lib/jvm/java-11-openjdk-amd64/lib/security/ || true
+      cp /etc/ssl/certs/java/cacerts $CRAFT_STAGE/usr/lib/jvm/java-11-openjdk-amd64/lib/security/ || true
     override-build: |
       # Run default Python plugin build first
       craftctl default
