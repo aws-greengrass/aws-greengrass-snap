@@ -18,6 +18,16 @@ plugs:
     target: $SNAP/docker
     default-provider: docker
 
+slots:
+  shared-files:
+    interface: content
+    content: shared-files
+    source:
+      read:
+        - $SNAP_COMMON/shared
+      write:
+        - $SNAP_COMMON/shared
+
 apps:
   configure:
     command: bin/python3 $SNAP/bin/iot-greengrass-setup.py
@@ -32,6 +42,8 @@ apps:
       - docker-executables
       - docker
       - camera
+    slots:
+      - shared-files
 
   greengrass-daemon:
     command: bin/greengrass-wrapper.sh
@@ -49,6 +61,8 @@ apps:
       - docker-executables
       - docker
       - camera
+    slots:
+      - shared-files
 
 parts:
   iot-greengrass-app:
@@ -57,16 +71,11 @@ parts:
     python-requirements:
       - requirements.txt
     stage-packages:
+      - ca-certificates
+      - ca-certificates-java
       - openjdk-11-jre-headless
     build-packages:
       - wget
-    override-stage: |
-      craftctl default
-      # Fix Java security symlinks by creating empty files
-      rm -f $CRAFT_STAGE/usr/lib/jvm/java-11-openjdk-amd64/lib/security/blacklisted.certs
-      rm -f $CRAFT_STAGE/usr/lib/jvm/java-11-openjdk-amd64/lib/security/cacerts
-      touch $CRAFT_STAGE/usr/lib/jvm/java-11-openjdk-amd64/lib/security/blacklisted.certs
-      touch $CRAFT_STAGE/usr/lib/jvm/java-11-openjdk-amd64/lib/security/cacerts
     override-build: |
       # Run default Python plugin build first
       craftctl default
@@ -83,3 +92,5 @@ parts:
 
       cp local-scripts/greengrass-wrapper.sh $CRAFT_PART_INSTALL/bin/
       chmod +x $CRAFT_PART_INSTALL/bin/greengrass-wrapper.sh
+    organize:
+      shared/: shared/
