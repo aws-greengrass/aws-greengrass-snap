@@ -97,10 +97,11 @@ parts:
       chmod +x $CRAFT_PART_INSTALL/bin/greengrass-wrapper.sh
 
       mkdir -p $CRAFT_PART_INSTALL/etc/ssl/certs/java
-      mkdir -p $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-amd64/lib/security
+      mkdir -p $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-arm64/lib/security
       touch $CRAFT_PART_INSTALL/etc/ssl/certs/blacklisted.certs
 
-      rm -f $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-amd64/lib/security/blacklisted.certs
-      touch $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-amd64/lib/security/blacklisted.certs
+      rm -f $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-arm64/lib/security/blacklisted.certs
+      touch $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-arm64/lib/security/blacklisted.certs
+
     organize:
       shared/: shared/
