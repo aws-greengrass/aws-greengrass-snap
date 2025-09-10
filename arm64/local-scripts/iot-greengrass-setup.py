@@ -274,7 +274,7 @@ def install_greengrass_v2(thing_name, region, cert_path, private_key_path, root_
         "services": {
             "aws.greengrass.Nucleus": {
                 "componentType": "NUCLEUS",
-                "version": "2.12.0",
+                "version": "2.14.3",
                 "configuration": {
                     "awsRegion": region,
                     "iotRoleAlias": iot_role_alias,
@@ -354,6 +354,8 @@ def install_greengrass_v2(thing_name, region, cert_path, private_key_path, root_
         install_cmd = [
             java_path,
             "-Droot=" + greengrass_root,
+            "-Djavax.net.ssl.trustStore=$SNAP/etc/ssl/certs/java/cacerts",
+            "-Djavax.net.ssl.trustStoreType=JKS",
             "-Dlog.store=FILE",
             "-jar", installer_jar,
             "--init-config", config_path,
