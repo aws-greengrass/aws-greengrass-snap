@@ -22,6 +22,10 @@ def get_aws_credentials():
 
     return access_key, secret_key, region
 
+def get_account_id():
+    sts_client = boto3.client('sts')
+    return sts_client.get_caller_identity()['Account']
+
 def get_device_info():
     """Get device information from user"""
     print("\n=== Device Configuration ===")
@@ -45,6 +49,7 @@ def create_aws_clients(access_key, secret_key, region):
         iot_client = session.client('iot')
         iam_client = session.client('iam')
         sts_client = session.client('sts')
+
         account_id = sts_client.get_caller_identity()['Account']
 
         return iot_client, iam_client, account_id
@@ -274,7 +279,7 @@ def install_greengrass_v2(thing_name, region, cert_path, private_key_path, root_
         "services": {
             "aws.greengrass.Nucleus": {
                 "componentType": "NUCLEUS",
-                "version": "2.12.0",
+                "version": "2.14.3",
                 "configuration": {
                     "awsRegion": region,
                     "iotRoleAlias": iot_role_alias,
@@ -354,6 +359,8 @@ def install_greengrass_v2(thing_name, region, cert_path, private_key_path, root_
         install_cmd = [
             java_path,
             "-Droot=" + greengrass_root,
+            "-Djavax.net.ssl.trustStore=$SNAP/etc/ssl/certs/java/cacerts",
+            "-Djavax.net.ssl.trustStoreType=JKS",
             "-Dlog.store=FILE",
             "-jar", installer_jar,
             "--init-config", config_path,
