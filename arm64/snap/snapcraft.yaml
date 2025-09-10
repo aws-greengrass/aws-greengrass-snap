@@ -102,5 +102,6 @@ parts:
 
       rm -f $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-arm64/lib/security/blacklisted.certs
       touch $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-arm64/lib/security/blacklisted.certs
+
     organize:
       shared/: shared/
