@@ -48,22 +48,42 @@ Copy *.snap package locally to the device (use SCP) and execute installation
 sudo snap install --dangerous ./aws-iot-greengrass_<version>_<arch>.snap
 ```
 
-Once installed successfully, configure Greengrass using the following commands:
+## Configuration
+
+There are two ways to configure Greengrass after installation:
+
+### Option 1: Interactive Setup (Development/Testing)
+
+Best for individual devices and development environments.
 
 ```bash
 ./connect.sh
-sudo aws-iot-greengrass-setup.configure
+sudo aws-iot-greengrass.configure
 ```
 
-The `connect.sh` script connects the installed Greengrass package to the Ubuntu Core slots that are not connected by default. (should not be needed once published to Snap store)
-
-The `sudo aws-iot-greengrass.configure` command prompts for the following information;
+The `sudo aws-iot-greengrass.configure` command prompts for:
 - AWS Access Key
 - AWS Secret Access Key
 - AWS Region
 - Device Name (for IoT Core Thing and Greengrass Core Device name)
 
 The Access Key/Secret Access Key corresponds to an IAM user with sufficient privileges to install and connect an IoT Thing to IoT Core, including provisioning certificates, and creating the Greengrass Core device.
+
+### Option 2: Bootstrap Setup with Claim Certificates (Fleet Provisioning)
+
+Best for manufacturing and fleet deployments where devices are pre-configured.
+
+```bash
+./connect.sh
+sudo aws-iot-greengrass.bootstrap
+```
+
+This approach uses pre-loaded claim certificates for fleet provisioning. See:
+- **[docs/BOOTSTRAP-QUICKSTART.md](docs/BOOTSTRAP-QUICKSTART.md)** - Quick start guide
+- **[docs/BOOTSTRAP-GUIDE.md](docs/BOOTSTRAP-GUIDE.md)** - Detailed implementation guide
+- **[docs/BOOTSTRAP-OVERVIEW.md](docs/BOOTSTRAP-OVERVIEW.md)** - Solution overview and architecture
+
+The `connect.sh` script connects the installed Greengrass package to the Ubuntu Core slots that are not connected by default. (should not be needed once published to Snap store)
 
 ## NOTES
 

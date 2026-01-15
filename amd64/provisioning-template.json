@@ -1,0 +1,53 @@
+{
+  "Parameters": {
+    "ThingName": {
+      "Type": "String"
+    },
+    "SerialNumber": {
+      "Type": "String"
+    },
+    "AWS::IoT::Certificate::Id": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "thing": {
+      "Type": "AWS::IoT::Thing",
+      "Properties": {
+        "ThingName": {
+          "Ref": "ThingName"
+        },
+        "ThingTypeName": "GreengrassCore",
+        "AttributePayload": {
+          "SerialNumber": {
+            "Ref": "SerialNumber"
+          }
+        }
+      },
+      "OverrideSettings": {
+        "AttributePayload": "MERGE",
+        "ThingTypeName": "REPLACE",
+        "ThingGroups": "DO_NOTHING"
+      }
+    },
+    "certificate": {
+      "Type": "AWS::IoT::Certificate",
+      "Properties": {
+        "CertificateId": {
+          "Ref": "AWS::IoT::Certificate::Id"
+        },
+        "Status": "ACTIVE"
+      }
+    },
+    "policy": {
+      "Type": "AWS::IoT::Policy",
+      "Properties": {
+        "PolicyName": "GreengrassV2IoTThingPolicy"
+      }
+    }
+  },
+  "DeviceConfiguration": {
+    "FallbackUrl": "https://www.example.com/fallback",
+    "BootstrapServers": []
+  }
+}

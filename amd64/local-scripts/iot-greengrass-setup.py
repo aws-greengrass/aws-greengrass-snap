@@ -279,7 +279,7 @@ def install_greengrass_v2(thing_name, region, cert_path, private_key_path, root_
         "services": {
             "aws.greengrass.Nucleus": {
                 "componentType": "NUCLEUS",
-                "version": "2.14.3",
+                "version": "2.16.0",
                 "configuration": {
                     "awsRegion": region,
                     "iotRoleAlias": iot_role_alias,

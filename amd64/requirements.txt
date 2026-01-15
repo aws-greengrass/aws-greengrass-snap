@@ -3,3 +3,4 @@ botocore
 requests
 PyYAML
 awsiotsdk
+snap-http
