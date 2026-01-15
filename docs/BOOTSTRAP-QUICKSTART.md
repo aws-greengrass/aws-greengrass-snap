@@ -19,7 +19,7 @@ Bootstrap setup uses claim certificates pre-loaded on devices to automatically p
 
 ```bash
 # Generate claim certificates
-cd amd64
+cd setup
 chmod +x create-claim-certificates.sh
 ./create-claim-certificates.sh
 ```

@@ -37,10 +37,10 @@ See [BOOTSTRAP-GUIDE.md](BOOTSTRAP-GUIDE.md) for:
 ### Scripts
 - `amd64/local-scripts/iot-greengrass-bootstrap.py` - Basic bootstrap script
 - `amd64/local-scripts/iot-greengrass-bootstrap-enhanced.py` - Enhanced with auto-detection
-- `amd64/create-claim-certificates.sh` - AWS setup helper
+- `setup/create-claim-certificates.sh` - AWS setup helper
 
 ### Configuration Templates
 - `amd64/bootstrap-config.yaml` - Device configuration template
-- `amd64/provisioning-template.json` - AWS IoT provisioning template
-- `amd64/device-policy.json` - IoT policy for devices
-- `amd64/trust-policy.json` - IAM trust policy
+- `setup/provisioning-template.json` - AWS IoT provisioning template
+- `setup/device-policy.json` - IoT policy for devices
+- `setup/trust-policy.json` - IAM trust policy
