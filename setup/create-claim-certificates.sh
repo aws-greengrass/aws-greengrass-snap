@@ -101,9 +101,63 @@ aws iot attach-policy \
 
 echo "[OK] Policy attached to certificate"
 
+# Create fleet provisioning template
+echo ""
+echo "Step 4: Creating fleet provisioning template..."
+
+# Check if template file exists
+if [ ! -f "./provisioning-template.json" ]; then
+    echo "Error: provisioning-template.json not found in current directory"
+    exit 1
+fi
+
+# Create IAM role for provisioning
+ROLE_NAME="GreengrassProvisioningRole"
+ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/${ROLE_NAME}"
+
+if ! aws iam get-role --role-name "$ROLE_NAME" &>/dev/null; then
+    aws iam create-role \
+        --role-name "$ROLE_NAME" \
+        --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"iot.amazonaws.com"},"Action":"sts:AssumeRole"}]}' > /dev/null
+    
+    aws iam put-role-policy \
+        --role-name "$ROLE_NAME" \
+        --policy-name "ProvisioningPolicy" \
+        --policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":["iot:CreateThing","iot:UpdateThing","iot:CreateCertificateFromCsr","iot:DescribeCertificate","iot:AttachThingPrincipal","iot:AttachPolicy","iot:CreatePolicy"],"Resource":"*"}]}'
+    
+    echo "[OK] IAM role created: $ROLE_NAME"
+    echo "[INFO] Waiting 10 seconds for IAM role to propagate..."
+    sleep 10
+else
+    echo "[OK] IAM role already exists: $ROLE_NAME"
+fi
+
+# Create thing type if it doesn't exist
+if ! aws iot describe-thing-type --thing-type-name "GreengrassCore" --region "$AWS_REGION" &>/dev/null; then
+    aws iot create-thing-type \
+        --thing-type-name "GreengrassCore" \
+        --region "$AWS_REGION" > /dev/null
+    echo "[OK] Thing type created: GreengrassCore"
+else
+    echo "[OK] Thing type already exists: GreengrassCore"
+fi
+
+# Create provisioning template
+if ! aws iot describe-provisioning-template --template-name "$TEMPLATE_NAME" --region "$AWS_REGION" &>/dev/null; then
+    aws iot create-provisioning-template \
+        --template-name "$TEMPLATE_NAME" \
+        --template-body file://./provisioning-template.json \
+        --provisioning-role-arn "$ROLE_ARN" \
+        --enabled \
+        --region "$AWS_REGION" > /dev/null
+    echo "[OK] Fleet provisioning template created: $TEMPLATE_NAME"
+else
+    echo "[OK] Fleet provisioning template already exists: $TEMPLATE_NAME"
+fi
+
 # Get IoT endpoints
 echo ""
-echo "Step 4: Getting IoT endpoints..."
+echo "Step 5: Getting IoT endpoints..."
 IOT_DATA_ENDPOINT=$(aws iot describe-endpoint --endpoint-type iot:Data-ATS --region "$AWS_REGION" --query endpointAddress --output text)
 IOT_CRED_ENDPOINT=$(aws iot describe-endpoint --endpoint-type iot:CredentialProvider --region "$AWS_REGION" --query endpointAddress --output text)
 
@@ -112,7 +166,7 @@ echo "[OK] IoT Cred Endpoint: $IOT_CRED_ENDPOINT"
 
 # Create bootstrap config
 echo ""
-echo "Step 5: Creating bootstrap configuration..."
+echo "Step 6: Creating bootstrap configuration..."
 cat > "$OUTPUT_DIR/bootstrap-config.yaml" <<EOF
 # AWS IoT Greengrass Bootstrap Configuration
 # Generated on $(date)
@@ -177,7 +231,6 @@ echo ""
 echo "Next steps:"
 echo "1. Review the files in $OUTPUT_DIR/"
 echo "2. Copy claim certificates and config to your devices"
-echo "3. Ensure provisioning template '$TEMPLATE_NAME' exists in AWS"
-echo "4. Run 'aws-iot-greengrass.bootstrap' on each device"
+echo "3. Run 'aws-iot-greengrass.bootstrap' on each device"
 echo ""
 echo "For detailed instructions, see docs/BOOTSTRAP-GUIDE.md"

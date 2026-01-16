@@ -42,12 +42,18 @@
     "policy": {
       "Type": "AWS::IoT::Policy",
       "Properties": {
-        "PolicyName": "GreengrassV2IoTThingPolicy"
+        "PolicyName": {
+          "Fn::Join": [
+            "",
+            [
+              "GreengrassV2IoTThingPolicy-",
+              {
+                "Ref": "ThingName"
+              }
+            ]
+          ]
+        }
       }
     }
-  },
-  "DeviceConfiguration": {
-    "FallbackUrl": "https://www.example.com/fallback",
-    "BootstrapServers": []
   }
 }
