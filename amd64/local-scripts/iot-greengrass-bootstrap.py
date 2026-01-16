@@ -144,7 +144,7 @@ def create_fleet_provisioning_config(config, device_name, root_ca_path):
     return greengrass_root, config_path
 
 def install_greengrass(greengrass_root, config_path):
-    """Install and start Greengrass with fleet provisioning"""
+    """Install Greengrass with fleet provisioning (daemon will start it)"""
     snap_dir = os.environ.get('SNAP', '/tmp')
     greengrass_zip = f"{snap_dir}/opt/greengrass/greengrass-nucleus.zip"
     
@@ -184,7 +184,7 @@ def install_greengrass(greengrass_root, config_path):
         print(f"[ERROR] Installer JAR not found: {installer_jar}")
         return False
     
-    # Install Greengrass
+    # Install Greengrass (setup only, don't start)
     install_cmd = [
         java_path,
         f"-Droot={greengrass_root}",
@@ -204,33 +204,8 @@ def install_greengrass(greengrass_root, config_path):
         return False
     
     print("[OK] Greengrass installed")
-    
-    # Start Greengrass
-    nucleus_jar = f"{greengrass_root}/alts/current/distro/lib/Greengrass.jar"
-    if not os.path.exists(nucleus_jar):
-        print(f"[ERROR] Nucleus JAR not found: {nucleus_jar}")
-        return False
-    
-    start_cmd = [
-        java_path,
-        f"-Droot={greengrass_root}",
-        "-Dlog.store=FILE",
-        "-jar", nucleus_jar
-    ]
-    
-    print("Starting Greengrass (fleet provisioning will begin)...")
-    process = subprocess.Popen(start_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    
-    # Monitor startup
-    for i in range(30):
-        time.sleep(1)
-        if process.poll() is not None:
-            print(f"[ERROR] Process exited early with code: {process.returncode}")
-            return False
-        print(f"  Startup check {i+1}/30...")
-    
-    print(f"[OK] Greengrass running (PID: {process.pid})")
-    print(f"[OK] Monitor logs: tail -f {greengrass_root}/logs/greengrass.log")
+    print("[INFO] Greengrass daemon will start automatically")
+    print("[INFO] Fleet provisioning will begin when daemon starts")
     return True
 
 def main():
@@ -271,6 +246,13 @@ def main():
         print(f"Device: {device_name}")
         print(f"Region: {config.get('awsRegion')}")
         print(f"Template: {config.get('provisioningTemplate')}")
+        print("\nNext steps:")
+        print("1. Start the Greengrass daemon:")
+        print("   sudo snap start aws-iot-greengrass.greengrass-daemon")
+        print("\n2. Monitor fleet provisioning:")
+        print(f"   tail -f {greengrass_root}/logs/greengrass.log")
+        print("\n3. Check daemon status:")
+        print("   snap services aws-iot-greengrass")
         print("\nFleet provisioning will exchange claim certificates")
         print("for permanent device certificates automatically.")
     else:

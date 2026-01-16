@@ -35,28 +35,23 @@ if [ ! -f "$JAVA_BIN" ]; then
     exit 1
 fi
 
-# Check if Greengrass JAR exists
-JAR_FILE="$GREENGRASS_DIR/lib/Greengrass.jar"
+# Check if Greengrass JAR exists (try both locations)
+JAR_FILE="$GREENGRASS_DIR/alts/current/distro/lib/Greengrass.jar"
 if [ ! -f "$JAR_FILE" ]; then
-    echo "ERROR: Greengrass.jar not found at $JAR_FILE"
-    ls -la "$GREENGRASS_DIR/lib/" || echo "lib directory not found"
-    exit 1
+    JAR_FILE="$GREENGRASS_DIR/lib/Greengrass.jar"
+    if [ ! -f "$JAR_FILE" ]; then
+        echo "ERROR: Greengrass.jar not found"
+        ls -la "$GREENGRASS_DIR/lib/" 2>/dev/null || echo "lib directory not found"
+        ls -la "$GREENGRASS_DIR/alts/current/distro/lib/" 2>/dev/null || echo "distro lib directory not found"
+        exit 1
+    fi
 fi
+echo "Using JAR: $JAR_FILE"
 
 # Start Greengrass with the snap's Java binary
 cd "$GREENGRASS_DIR"
 echo "Starting Greengrass from directory: $(pwd)"
+echo "Command: $JAVA_BIN -Droot=$GREENGRASS_DIR -Dlog.store=FILE -jar $JAR_FILE"
 
-# Use the configuration file if available
-CONFIG_FILE="$GREENGRASS_DIR/config/effectiveConfig.yaml"
-if [ -f "$CONFIG_FILE" ]; then
-    echo "Using config file: $CONFIG_FILE"
-    exec "$JAVA_BIN" -Droot="$GREENGRASS_DIR" -Dlog.store=FILE \
-         -jar "$JAR_FILE" \
-         --config "$CONFIG_FILE"
-else
-    echo "Config file not found, starting with basic parameters"
-    exec "$JAVA_BIN" -Droot="$GREENGRASS_DIR" -Dlog.store=FILE \
-         -jar "$JAR_FILE"
-fi
+exec "$JAVA_BIN" -Droot="$GREENGRASS_DIR" -Dlog.store=FILE -jar "$JAR_FILE"
 
