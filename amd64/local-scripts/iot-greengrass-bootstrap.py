@@ -122,7 +122,8 @@ def create_fleet_provisioning_config(config, device_name, root_ca_path):
                     "iotDataEndpoint": iot_data_endpoint,
                     "rootPath": greengrass_root,
                     "templateParameters": {
-                        "ThingName": device_name
+                        "ThingName": device_name,
+                        "SerialNumber": config.get('serialNumber', device_name)
                     }
                 }
             }
