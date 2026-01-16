@@ -120,7 +120,10 @@ def create_fleet_provisioning_config(config, device_name, root_ca_path):
                     "claimCertificatePrivateKeyPath": config['claimPrivateKeyPath'],
                     "rootCaPath": root_ca_path,
                     "iotDataEndpoint": iot_data_endpoint,
-                    "rootPath": greengrass_root
+                    "rootPath": greengrass_root,
+                    "templateParameters": {
+                        "ThingName": device_name
+                    }
                 }
             }
         }
