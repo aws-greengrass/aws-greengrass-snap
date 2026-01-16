@@ -44,27 +44,18 @@ Device Boot → Load Config → Validate Certs → Start Greengrass
 ### 1. Create Provisioning Role
 
 ```bash
-# Create trust policy
-cat > trust-policy.json <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [{
-    "Effect": "Allow",
-    "Principal": {"Service": "iot.amazonaws.com"},
-    "Action": "sts:AssumeRole"
-  }]
-}
-EOF
-
-# Create role
+# Create role with trust policy
 aws iam create-role \
-  --role-name IoTFleetProvisioningRole \
-  --assume-role-policy-document file://trust-policy.json
+  --role-name GreengrassProvisioningRole \
+  --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"iot.amazonaws.com"},"Action":"sts:AssumeRole"}]}'
 
-# Attach policy
+# Attach AWS managed policy
 aws iam attach-role-policy \
-  --role-name IoTFleetProvisioningRole \
+  --role-name GreengrassProvisioningRole \
   --policy-arn arn:aws:iam::aws:policy/service-role/AWSIoTThingsRegistration
+
+# Wait for role propagation
+sleep 15
 ```
 
 ### 2. Create Device Policy
@@ -82,7 +73,7 @@ aws iot create-policy \
 # Create template
 aws iot create-provisioning-template \
   --template-name GreengrassFleetProvisioningTemplate \
-  --provisioning-role-arn arn:aws:iam::ACCOUNT_ID:role/IoTFleetProvisioningRole \
+  --provisioning-role-arn arn:aws:iam::ACCOUNT_ID:role/GreengrassProvisioningRole \
   --template-body file://provisioning-template.json \
   --enabled
 
@@ -245,8 +236,8 @@ aws iot describe-provisioning-template --template-name YOUR_TEMPLATE
 
 **Check role permissions:**
 ```bash
-aws iam get-role --role-name IoTFleetProvisioningRole
-aws iam list-attached-role-policies --role-name IoTFleetProvisioningRole
+aws iam get-role --role-name GreengrassProvisioningRole
+aws iam list-attached-role-policies --role-name GreengrassProvisioningRole
 ```
 
 ### Greengrass Won't Start
