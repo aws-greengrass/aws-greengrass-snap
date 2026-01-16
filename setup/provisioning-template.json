@@ -42,15 +42,34 @@
     "policy": {
       "Type": "AWS::IoT::Policy",
       "Properties": {
-        "PolicyName": {
-          "Fn::Join": [
-            "",
-            [
-              "GreengrassV2IoTThingPolicy-",
-              {
-                "Ref": "ThingName"
-              }
-            ]
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": ["iot:Connect"],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["iot:Publish"],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["iot:Subscribe"],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["iot:Receive"],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["greengrass:*"],
+              "Resource": "*"
+            }
           ]
         }
       }
