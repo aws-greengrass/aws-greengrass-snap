@@ -118,7 +118,7 @@ def create_fleet_provisioning_config(config, device_name, root_ca_path):
                     "rootCaPath": root_ca_path,
                     "claimCertificatePath": config['claimCertificatePath'],
                     "claimCertificatePrivateKeyPath": config['claimPrivateKeyPath'],
-                    "templateName": template_name,
+                    "provisioningTemplate": template_name,
                     "templateParameters": {
                         "ThingName": device_name,
                         "SerialNumber": config.get('serialNumber', device_name)
