@@ -69,7 +69,9 @@ cat > "$OUTPUT_DIR/claim-policy.json" <<EOF
       "Action": ["iot:Publish", "iot:Receive"],
       "Resource": [
         "arn:aws:iot:${AWS_REGION}:${ACCOUNT_ID}:topic/\$aws/certificates/create/*",
-        "arn:aws:iot:${AWS_REGION}:${ACCOUNT_ID}:topic/\$aws/provisioning-templates/${TEMPLATE_NAME}/provision/*"
+        "arn:aws:iot:${AWS_REGION}:${ACCOUNT_ID}:topic/\$aws/provisioning-templates/${TEMPLATE_NAME}/provision/*",
+        "arn:aws:iot:${AWS_REGION}:${ACCOUNT_ID}:topic/\$aws/things/*/shadow/*",
+        "arn:aws:iot:${AWS_REGION}:${ACCOUNT_ID}:topic/\$aws/things/*/jobs/*"
       ]
     },
     {
@@ -77,7 +79,9 @@ cat > "$OUTPUT_DIR/claim-policy.json" <<EOF
       "Action": ["iot:Subscribe"],
       "Resource": [
         "arn:aws:iot:${AWS_REGION}:${ACCOUNT_ID}:topicfilter/\$aws/certificates/create/*",
-        "arn:aws:iot:${AWS_REGION}:${ACCOUNT_ID}:topicfilter/\$aws/provisioning-templates/${TEMPLATE_NAME}/provision/*"
+        "arn:aws:iot:${AWS_REGION}:${ACCOUNT_ID}:topicfilter/\$aws/provisioning-templates/${TEMPLATE_NAME}/provision/*",
+        "arn:aws:iot:${AWS_REGION}:${ACCOUNT_ID}:topicfilter/\$aws/things/*/shadow/*",
+        "arn:aws:iot:${AWS_REGION}:${ACCOUNT_ID}:topicfilter/\$aws/things/*/jobs/*"
       ]
     }
   ]

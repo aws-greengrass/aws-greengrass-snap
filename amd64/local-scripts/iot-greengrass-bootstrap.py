@@ -98,11 +98,7 @@ def create_fleet_provisioning_config(config, device_name, root_ca_path):
     # Build Greengrass config with fleet provisioning
     gg_config = {
         "system": {
-            "certificateFilePath": config['claimCertificatePath'],
-            "privateKeyPath": config['claimPrivateKeyPath'],
-            "rootCaPath": root_ca_path,
-            "rootpath": greengrass_root,
-            "thingName": device_name
+            "rootpath": greengrass_root
         },
         "services": {
             "aws.greengrass.Nucleus": {
@@ -112,24 +108,25 @@ def create_fleet_provisioning_config(config, device_name, root_ca_path):
                     "awsRegion": region,
                     "iotRoleAlias": config.get('iotRoleAlias', 'GreengrassV2TokenExchangeRoleAlias'),
                     "iotDataEndpoint": iot_data_endpoint,
-                    "iotCredEndpoint": iot_cred_endpoint,
-                    "runWithDefault": {
-                        "posixUser": "root"
-                    }
+                    "iotCredEndpoint": iot_cred_endpoint
                 }
             },
-            "aws.greengrass.FleetProvisioning": {
+            "aws.greengrass.FleetProvisioningByClaim": {
                 "componentType": "PLUGIN",
+                "version": "0.0.0",
                 "configuration": {
-                    "provisioningTemplate": template_name,
+                    "rootCaPath": root_ca_path,
                     "claimCertificatePath": config['claimCertificatePath'],
                     "claimCertificatePrivateKeyPath": config['claimPrivateKeyPath'],
-                    "rootCaPath": root_ca_path,
-                    "awsRegion": region,
-                    "iotDataEndpoint": iot_data_endpoint,
+                    "templateName": template_name,
                     "templateParameters": {
                         "ThingName": device_name,
                         "SerialNumber": config.get('serialNumber', device_name)
+                    },
+                    "deviceConfiguration": {
+                        "thingName": device_name,
+                        "certificatePath": f"{greengrass_root}/certs/device.pem.crt",
+                        "privateKeyPath": f"{greengrass_root}/private/device.pem.key"
                     }
                 }
             }
@@ -156,6 +153,20 @@ def install_greengrass(greengrass_root, config_path):
         zip_ref.extractall(greengrass_root)
     print("[OK] Extracted Greengrass installer")
     
+    # Copy FleetProvisioningByClaim plugin
+    fleet_plugin_src = f"{snap_dir}/opt/greengrass/aws.greengrass.FleetProvisioningByClaim.jar"
+    plugins_dir = f"{greengrass_root}/plugins"
+    os.makedirs(plugins_dir, exist_ok=True)
+    fleet_plugin_dst = f"{plugins_dir}/aws.greengrass.FleetProvisioningByClaim.jar"
+    
+    if os.path.exists(fleet_plugin_src):
+        import shutil
+        shutil.copy2(fleet_plugin_src, fleet_plugin_dst)
+        print(f"[OK] Copied FleetProvisioningByClaim plugin")
+    else:
+        print(f"[ERROR] FleetProvisioningByClaim plugin not found: {fleet_plugin_src}")
+        return False
+    
     # Find Java
     java_paths = [
         f"{snap_dir}/usr/lib/jvm/java-11-openjdk-amd64/bin/java",
@@ -180,9 +191,14 @@ def install_greengrass(greengrass_root, config_path):
     print(f"[OK] Using Java: {java_path}")
     
     installer_jar = f"{greengrass_root}/lib/Greengrass.jar"
-    fleetprovisioning_jar = f"{greengrass_root}/plugins/aws.greengrass.FleetProvisioningByClaim.jar"
+    fleet_plugin_jar = f"{greengrass_root}/plugins/aws.greengrass.FleetProvisioningByClaim.jar"
+    
     if not os.path.exists(installer_jar):
         print(f"[ERROR] Installer JAR not found: {installer_jar}")
+        return False
+    
+    if not os.path.exists(fleet_plugin_jar):
+        print(f"[ERROR] Fleet plugin JAR not found: {fleet_plugin_jar}")
         return False
     
     # Install Greengrass (setup only, don't start)
@@ -191,7 +207,7 @@ def install_greengrass(greengrass_root, config_path):
         f"-Droot={greengrass_root}",
         "-Dlog.store=FILE",
         "-jar", installer_jar,
-        "-trusted-plugin", fleetprovisioning_jar,
+        "--trusted-plugin", fleet_plugin_jar,
         "--init-config", config_path,
         "--component-default-user", "root:root",
         "--setup-system-service", "false",
