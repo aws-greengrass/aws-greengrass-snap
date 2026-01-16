@@ -69,6 +69,11 @@
               "Effect": "Allow",
               "Action": ["greengrass:*"],
               "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["iot:AssumeRoleWithCertificate"],
+              "Resource": "arn:aws:iot:*:*:rolealias/GreengrassV2TokenExchangeRoleAlias"
             }
           ]
         }
