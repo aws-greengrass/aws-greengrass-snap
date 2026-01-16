@@ -124,14 +124,13 @@ if ! aws iam get-role --role-name "$ROLE_NAME" &>/dev/null; then
         --role-name "$ROLE_NAME" \
         --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"iot.amazonaws.com"},"Action":"sts:AssumeRole"}]}' > /dev/null
     
-    aws iam put-role-policy \
+    aws iam attach-role-policy \
         --role-name "$ROLE_NAME" \
-        --policy-name "ProvisioningPolicy" \
-        --policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":["iot:CreateThing","iot:UpdateThing","iot:CreateCertificateFromCsr","iot:DescribeCertificate","iot:AttachThingPrincipal","iot:AttachPolicy","iot:CreatePolicy"],"Resource":"*"}]}'
+        --policy-arn "arn:aws:iam::aws:policy/service-role/AWSIoTThingsRegistration"
     
     echo "[OK] IAM role created: $ROLE_NAME"
-    echo "[INFO] Waiting 10 seconds for IAM role to propagate..."
-    sleep 10
+    echo "[INFO] Waiting 15 seconds for IAM role to propagate..."
+    sleep 15
 else
     echo "[OK] IAM role already exists: $ROLE_NAME"
 fi
