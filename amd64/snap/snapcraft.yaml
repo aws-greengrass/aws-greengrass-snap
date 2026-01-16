@@ -104,6 +104,9 @@ parts:
       wget -O $CRAFT_PART_INSTALL/opt/greengrass/greengrass-nucleus.zip \
         https://d2s8p88vqu9w66.cloudfront.net/releases/greengrass-2.16.0.zip
 
+      wget -O $CRAFT_PART_INSTALL/opt/greengrass/aws.greengrass.FleetProvisioningByClaim.jar \
+        https://d2s8p88vqu9w66.cloudfront.net/releases/aws-greengrass-FleetProvisioningByClaim/fleetprovisioningbyclaim-latest.jar
+
       # Ensure Python scripts are executable and in correct location
       mkdir -p $CRAFT_PART_INSTALL/bin
       cp local-scripts/iot-greengrass-setup.py $CRAFT_PART_INSTALL/bin/

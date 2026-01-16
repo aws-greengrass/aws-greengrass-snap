@@ -180,6 +180,7 @@ def install_greengrass(greengrass_root, config_path):
     print(f"[OK] Using Java: {java_path}")
     
     installer_jar = f"{greengrass_root}/lib/Greengrass.jar"
+    fleetprovisioning_jar = f"{greengrass_root}/plugins/aws.greengrass.FleetProvisioningByClaim.jar"
     if not os.path.exists(installer_jar):
         print(f"[ERROR] Installer JAR not found: {installer_jar}")
         return False
@@ -190,6 +191,7 @@ def install_greengrass(greengrass_root, config_path):
         f"-Droot={greengrass_root}",
         "-Dlog.store=FILE",
         "-jar", installer_jar,
+        "-trusted-plugin", fleetprovisioning_jar,
         "--init-config", config_path,
         "--component-default-user", "root:root",
         "--setup-system-service", "false",
