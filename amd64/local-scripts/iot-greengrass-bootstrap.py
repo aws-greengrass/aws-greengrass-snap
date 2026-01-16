@@ -115,19 +115,12 @@ def create_fleet_provisioning_config(config, device_name, root_ca_path):
                 "componentType": "PLUGIN",
                 "version": "0.0.0",
                 "configuration": {
-                    "rootCaPath": root_ca_path,
+                    "provisioningTemplate": template_name,
                     "claimCertificatePath": config['claimCertificatePath'],
                     "claimCertificatePrivateKeyPath": config['claimPrivateKeyPath'],
-                    "provisioningTemplate": template_name,
-                    "templateParameters": {
-                        "ThingName": device_name,
-                        "SerialNumber": config.get('serialNumber', device_name)
-                    },
-                    "deviceConfiguration": {
-                        "thingName": device_name,
-                        "certificatePath": f"{greengrass_root}/certs/device.pem.crt",
-                        "privateKeyPath": f"{greengrass_root}/private/device.pem.key"
-                    }
+                    "rootCaPath": root_ca_path,
+                    "iotDataEndpoint": iot_data_endpoint,
+                    "rootPath": greengrass_root
                 }
             }
         }
