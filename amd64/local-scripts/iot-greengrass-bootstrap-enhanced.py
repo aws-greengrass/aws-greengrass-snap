@@ -24,8 +24,8 @@ def get_hardware_serial():
                     serial = line.split(':')[1].strip()
                     if serial and serial != '0000000000000000':
                         return serial
-    except:
-        pass
+    except Exception as e:
+        print(f"[WARN] Could not get serial number from /proc/cpuinfo: {e}")
     
     # Try DMI serial
     try:
@@ -35,8 +35,8 @@ def get_hardware_serial():
             serial = result.stdout.strip()
             if serial and serial.lower() not in ['to be filled by o.e.m.', 'not specified']:
                 return serial
-    except:
-        pass
+    except Exception as e:
+        print(f"[WARN] Could not get serial number using dmidecod: {e}")
     
     return None
 
@@ -50,8 +50,8 @@ def get_mac_address():
             if 'link/ether' in line and 'LOOPBACK' not in line:
                 mac = line.split()[1]
                 return mac.replace(':', '')
-    except:
-        pass
+    except Exception as e:
+        print(f"[WARN] Could not get MAC address: {e}")
     
     return None
 

@@ -3,7 +3,7 @@ version: '2.16.0'
 summary: AWS IoT Core and Greengrass v2 configurator
 description: A Python application to configure AWS IoT Core things and install Greengrass v2
 
-base: core22
+base: core24
 confinement: strict
 grade: stable
 
