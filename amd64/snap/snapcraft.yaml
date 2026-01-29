@@ -1,5 +1,5 @@
 name: aws-iot-greengrass
-version: '2.14.3'
+version: '2.16.0'
 summary: AWS IoT Core and Greengrass v2 configurator
 description: A Python application to configure AWS IoT Core things and install Greengrass v2
 
@@ -34,6 +34,22 @@ slots:
 apps:
   configure:
     command: bin/python3 $SNAP/bin/iot-greengrass-setup.py
+    plugs:
+      - network
+      - network-bind
+      - home
+      - system-observe
+      - mount-observe
+      - hardware-observe
+      - process-control
+      - docker-executables
+      - docker
+      - camera
+    slots:
+      - shared-files
+
+  bootstrap:
+    command: bin/python3 $SNAP/bin/iot-greengrass-bootstrap.py
     plugs:
       - network
       - network-bind
@@ -86,15 +102,25 @@ parts:
       # Create directory and download Greengrass installer
       mkdir -p $CRAFT_PART_INSTALL/opt/greengrass
       wget -O $CRAFT_PART_INSTALL/opt/greengrass/greengrass-nucleus.zip \
-        https://d2s8p88vqu9w66.cloudfront.net/releases/greengrass-2.14.3.zip
+        https://d2s8p88vqu9w66.cloudfront.net/releases/greengrass-2.16.0.zip
 
-      # Ensure Python script is executable and in correct location
+      wget -O $CRAFT_PART_INSTALL/opt/greengrass/aws.greengrass.FleetProvisioningByClaim.jar \
+        https://d2s8p88vqu9w66.cloudfront.net/releases/aws-greengrass-FleetProvisioningByClaim/fleetprovisioningbyclaim-latest.jar
+
+      # Ensure Python scripts are executable and in correct location
       mkdir -p $CRAFT_PART_INSTALL/bin
       cp local-scripts/iot-greengrass-setup.py $CRAFT_PART_INSTALL/bin/
       chmod +x $CRAFT_PART_INSTALL/bin/iot-greengrass-setup.py
 
+      cp local-scripts/iot-greengrass-bootstrap.py $CRAFT_PART_INSTALL/bin/
+      chmod +x $CRAFT_PART_INSTALL/bin/iot-greengrass-bootstrap.py
+
       cp local-scripts/greengrass-wrapper.sh $CRAFT_PART_INSTALL/bin/
       chmod +x $CRAFT_PART_INSTALL/bin/greengrass-wrapper.sh
+
+      # Copy bootstrap config template
+      mkdir -p $CRAFT_PART_INSTALL/etc
+      cp bootstrap-config.yaml $CRAFT_PART_INSTALL/etc/bootstrap-config.yaml.template
 
       mkdir -p $CRAFT_PART_INSTALL/etc/ssl/certs/java
       mkdir -p $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-amd64/lib/security

@@ -1,0 +1,44 @@
+# AWS IoT Greengrass Bootstrap Configuration
+# This file should be pre-loaded on the device before running bootstrap setup
+
+# AWS Region where IoT Core and Greengrass are configured
+awsRegion: "us-east-1"
+
+# Device name for IoT Core Thing
+# Set to "PROMPT" to ask user during bootstrap, or specify a fixed name
+# You can also use device-specific identifiers like serial numbers
+deviceName: "PROMPT"
+
+# Optional: Serial number or unique device identifier
+# This can be passed as a template parameter during provisioning
+serialNumber: ""
+
+# Fleet Provisioning Template name (must exist in your AWS account)
+# This template defines how the device will be provisioned
+provisioningTemplate: "GreengrassFleetProvisioningTemplate"
+
+# IoT Endpoints (get these from AWS IoT Core console or CLI)
+# Run: aws iot describe-endpoint --endpoint-type iot:Data-ATS
+iotDataEndpoint: "your-iot-endpoint.iot.us-east-1.amazonaws.com"
+
+# Run: aws iot describe-endpoint --endpoint-type iot:CredentialProvider
+iotCredEndpoint: "your-credentials-endpoint.credentials.iot.us-east-1.amazonaws.com"
+
+# IoT Role Alias for token exchange (must be created in advance)
+iotRoleAlias: "GreengrassV2TokenExchangeRoleAlias"
+
+# Greengrass Nucleus version
+nucleusVersion: "2.16.0"
+
+# Paths to claim certificates (pre-loaded on device)
+# These are temporary certificates used only for initial provisioning
+claimCertificatePath: "/var/snap/aws-iot-greengrass/common/claim-certs/claim.cert.pem"
+claimPrivateKeyPath: "/var/snap/aws-iot-greengrass/common/claim-certs/claim.private.key"
+
+# Optional: Additional template parameters
+# These will be passed to the provisioning template
+templateParameters:
+  # Add any custom parameters your provisioning template expects
+  # Example:
+  # Location: "Factory-A"
+  # DeviceType: "Sensor"

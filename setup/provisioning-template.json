@@ -1,0 +1,83 @@
+{
+  "Parameters": {
+    "ThingName": {
+      "Type": "String"
+    },
+    "SerialNumber": {
+      "Type": "String"
+    },
+    "AWS::IoT::Certificate::Id": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "thing": {
+      "Type": "AWS::IoT::Thing",
+      "Properties": {
+        "ThingName": {
+          "Ref": "ThingName"
+        },
+        "ThingTypeName": "GreengrassCore",
+        "AttributePayload": {
+          "SerialNumber": {
+            "Ref": "SerialNumber"
+          }
+        }
+      },
+      "OverrideSettings": {
+        "AttributePayload": "MERGE",
+        "ThingTypeName": "REPLACE",
+        "ThingGroups": "DO_NOTHING"
+      }
+    },
+    "certificate": {
+      "Type": "AWS::IoT::Certificate",
+      "Properties": {
+        "CertificateId": {
+          "Ref": "AWS::IoT::Certificate::Id"
+        },
+        "Status": "ACTIVE"
+      }
+    },
+    "policy": {
+      "Type": "AWS::IoT::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": ["iot:Connect"],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["iot:Publish"],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["iot:Subscribe"],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["iot:Receive"],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["greengrass:*"],
+              "Resource": "*"
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["iot:AssumeRoleWithCertificate"],
+              "Resource": "arn:aws:iot:*:*:rolealias/GreengrassV2TokenExchangeRoleAlias"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
