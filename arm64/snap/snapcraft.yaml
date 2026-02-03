@@ -128,6 +128,11 @@ parts:
 
       rm -f $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-arm64/lib/security/blacklisted.certs
       touch $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-arm64/lib/security/blacklisted.certs
+      
+      # Remove the external symlink and copy the actual cacerts file
+      rm -f $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-arm64/lib/security/cacerts
+      cp $CRAFT_PART_INSTALL/etc/ssl/certs/java/cacerts \
+        $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-arm64/lib/security/cacerts
 
     organize:
       shared/: shared/
