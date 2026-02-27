@@ -11,6 +11,6 @@ rm -rf parts prime stage
 
 # Build the snap
 echo "Building snap package..."
-snapcraft --destructive-mode
+snapcraft remote-build
 
 echo "Build completed."

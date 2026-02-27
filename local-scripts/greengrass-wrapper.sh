@@ -23,14 +23,39 @@ fi
 
 echo "Found Greengrass directory, attempting to start..."
 
-# Use the Java binary from within the snap
-JAVA_BIN="$SNAP/usr/lib/jvm/java-11-openjdk-arm64/bin/java"
+# Determine architecture and set JAVA_HOME
+case "$(uname -m)" in
+    x86_64)
+        ARCH="amd64"
+        ;;
+    aarch64)
+        ARCH="arm64"
+        ;;
+    *)
+        echo "ERROR: Unsupported architecture: $(uname -m)"
+        exit 1
+        ;;
+esac
+
+# Try architecture-agnostic symlink first, fall back to architecture-specific path
+if [ -d "$SNAP/usr/lib/jvm/java-11-openjdk" ]; then
+    export JAVA_HOME="$SNAP/usr/lib/jvm/java-11-openjdk"
+elif [ -d "$SNAP/usr/lib/jvm/java-11-openjdk-${ARCH}" ]; then
+    export JAVA_HOME="$SNAP/usr/lib/jvm/java-11-openjdk-${ARCH}"
+else
+    echo "ERROR: No Java installation found"
+    find "$SNAP/usr/lib/jvm" -maxdepth 1 -type d 2>/dev/null || echo "No JVM directory found"
+    exit 1
+fi
+
+JAVA_BIN="$JAVA_HOME/bin/java"
+echo "Detected architecture: $ARCH"
+echo "Using JAVA_HOME: $JAVA_HOME"
 echo "Using Java binary: $JAVA_BIN"
 
 # Check if Java binary exists
 if [ ! -f "$JAVA_BIN" ]; then
     echo "ERROR: Java binary not found at $JAVA_BIN"
-    # Try to find Java in common locations within the snap
     find "$SNAP" -name "java" -type f 2>/dev/null || echo "No Java binary found in snap"
     exit 1
 fi
@@ -59,4 +84,3 @@ else
     exec "$JAVA_BIN" -Droot="$GREENGRASS_DIR" -Dlog.store=FILE \
          -jar "$JAR_FILE"
 fi
-
