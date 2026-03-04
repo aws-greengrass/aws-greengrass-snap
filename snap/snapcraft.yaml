@@ -1,5 +1,5 @@
 name: aws-iot-greengrass
-version: '2.16.0'
+version: '2.16.1'
 summary: AWS IoT Core and Greengrass v2 configurator
 description: A Python application to configure AWS IoT Core things and install Greengrass v2
 
@@ -7,10 +7,18 @@ base: core24
 confinement: strict
 grade: stable
 
+platforms:
+  amd64:
+    build-on: [amd64]
+    build-for: [amd64]
+  arm64:
+    build-on: [arm64]
+    build-for: [arm64]
+
 environment:
   PATH: $SNAP/docker/bin:$PATH
   PYTHONPATH: $SNAP/lib/python3.12/site-packages:$PYTHON_PATH
-  JAVA_HOME: $SNAP/usr/lib/jvm/java-11-openjdk-arm64
+  JAVA_HOME: $SNAP/usr/lib/jvm/java-11-openjdk
 
 layout:
   /etc/ssl/certs/java:
@@ -45,6 +53,7 @@ apps:
       - docker-executables
       - docker
       - camera
+      - snapd-control
     slots:
       - shared-files
 
@@ -61,6 +70,7 @@ apps:
       - docker-executables
       - docker
       - camera
+      - snapd-control
     slots:
       - shared-files
 
@@ -80,6 +90,7 @@ apps:
       - docker-executables
       - docker
       - camera
+      - snapd-control
     slots:
       - shared-files
 
@@ -99,10 +110,14 @@ parts:
       # Run default Python plugin build first
       craftctl default
 
+      # Detect architecture
+      ARCH=$(dpkg --print-architecture)
+      JAVA_DIR="java-11-openjdk-${ARCH}"
+
       # Create directory and download Greengrass installer
       mkdir -p $CRAFT_PART_INSTALL/opt/greengrass
       wget -O $CRAFT_PART_INSTALL/opt/greengrass/greengrass-nucleus.zip \
-        https://d2s8p88vqu9w66.cloudfront.net/releases/greengrass-2.16.0.zip
+        https://d2s8p88vqu9w66.cloudfront.net/releases/greengrass-2.16.1.zip
 
       wget -O $CRAFT_PART_INSTALL/opt/greengrass/aws.greengrass.FleetProvisioningByClaim.jar \
         https://d2s8p88vqu9w66.cloudfront.net/releases/aws-greengrass-FleetProvisioningByClaim/fleetprovisioningbyclaim-latest.jar
@@ -122,19 +137,23 @@ parts:
       mkdir -p $CRAFT_PART_INSTALL/etc
       cp bootstrap-config.yaml $CRAFT_PART_INSTALL/etc/bootstrap-config.yaml.template
 
+      # Set up Java certificate directories
       mkdir -p $CRAFT_PART_INSTALL/etc/ssl/certs/java
-      mkdir -p $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-arm64/lib/security
+      mkdir -p $CRAFT_PART_INSTALL/usr/lib/jvm/${JAVA_DIR}/lib/security
       touch $CRAFT_PART_INSTALL/etc/ssl/certs/blacklisted.certs
 
-      rm -f $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-arm64/lib/security/blacklisted.certs
-      touch $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-arm64/lib/security/blacklisted.certs
-      
+      rm -f $CRAFT_PART_INSTALL/usr/lib/jvm/${JAVA_DIR}/lib/security/blacklisted.certs
+      touch $CRAFT_PART_INSTALL/usr/lib/jvm/${JAVA_DIR}/lib/security/blacklisted.certs
+
       # Remove the external symlink and copy the actual cacerts file if it exists
-      rm -f $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-arm64/lib/security/cacerts
+      rm -f $CRAFT_PART_INSTALL/usr/lib/jvm/${JAVA_DIR}/lib/security/cacerts
       if [ -f $CRAFT_PART_INSTALL/etc/ssl/certs/java/cacerts ]; then
         cp $CRAFT_PART_INSTALL/etc/ssl/certs/java/cacerts \
-          $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk-arm64/lib/security/cacerts
+          $CRAFT_PART_INSTALL/usr/lib/jvm/${JAVA_DIR}/lib/security/cacerts
       fi
+
+      # Create architecture-agnostic symlink for JAVA_HOME
+      ln -sfn ${JAVA_DIR} $CRAFT_PART_INSTALL/usr/lib/jvm/java-11-openjdk
 
     organize:
       shared/: shared/
