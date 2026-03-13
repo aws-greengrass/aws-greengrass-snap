@@ -5,9 +5,48 @@ import zipfile
 import subprocess
 import time
 import glob
+import platform
 import boto3
 from botocore.exceptions import ClientError
 import yaml
+
+def get_architecture():
+    """Detect system architecture and return appropriate Java directory suffix"""
+    machine = platform.machine()
+    arch_map = {
+        'x86_64': 'amd64',
+        'aarch64': 'arm64',
+        'armv7l': 'armhf'
+    }
+    return arch_map.get(machine, machine)
+
+def find_java_binary(snap_dir):
+    """Find Java binary, trying architecture-agnostic symlink first, then arch-specific paths"""
+    arch = get_architecture()
+
+    # Ordered list of paths to try
+    java_paths = [
+        # Architecture-agnostic symlink (created in snapcraft.yaml)
+        f"{snap_dir}/usr/lib/jvm/java-11-openjdk/bin/java",
+        # Architecture-specific paths
+        f"{snap_dir}/usr/lib/jvm/java-11-openjdk-{arch}/bin/java",
+        # Glob pattern as fallback
+        f"{snap_dir}/usr/lib/jvm/java-11-openjdk-*/bin/java",
+        # System paths
+        f"{snap_dir}/usr/bin/java",
+        "/usr/bin/java",
+    ]
+
+    for path in java_paths:
+        if '*' in path:
+            matches = glob.glob(path)
+            if matches:
+                return matches[0]
+        elif os.path.exists(path):
+            return path
+
+    # Last resort: system java
+    return "java"
 
 def get_aws_credentials():
     """Get AWS credentials from user input"""
@@ -244,6 +283,10 @@ def install_greengrass_v2(thing_name, region, cert_path, private_key_path, root_
     """Install and configure AWS Greengrass v2"""
     print("\n=== Installing AWS Greengrass v2 ===")
 
+    # Display architecture info
+    arch = get_architecture()
+    print(f"✓ Detected architecture: {arch} ({platform.machine()})")
+
     # Create Greengrass directory
     greengrass_root = f"{os.environ.get('SNAP_COMMON', '/tmp')}/greengrass/v2"
     os.makedirs(greengrass_root, exist_ok=True)
@@ -274,7 +317,7 @@ def install_greengrass_v2(thing_name, region, cert_path, private_key_path, root_
         "services": {
             "aws.greengrass.Nucleus": {
                 "componentType": "NUCLEUS",
-                "version": "2.14.3",
+                "version": "2.16.1",
                 "configuration": {
                     "awsRegion": region,
                     "iotRoleAlias": iot_role_alias,
@@ -297,36 +340,20 @@ def install_greengrass_v2(thing_name, region, cert_path, private_key_path, root_
     print(f"  IoT Data Endpoint: {iot_data_endpoint}")
     print(f"  IoT Cred Endpoint: {iot_cred_endpoint}")
 
-    # Find and test Java binary
-    snap_dir = os.environ.get('SNAP', '')
-    possible_java_paths = [
-        f"{snap_dir}/usr/lib/jvm/java-11-openjdk-amd64/bin/java",
-        f"{snap_dir}/usr/lib/jvm/java-11-openjdk-*/bin/java",
-        f"{snap_dir}/usr/bin/java",
-        "/usr/bin/java",
-        "java"
-    ]
+    # Find Java binary using architecture detection
+    java_path = find_java_binary(snap_dir)
+    print(f"✓ Using Java at: {java_path}")
 
-    java_path = None
-    for path in possible_java_paths:
-        if '*' in path:
-            matches = glob.glob(path)
-            if matches:
-                java_path = matches[0]
-                break
-        elif os.path.exists(path):
-            java_path = path
-            break
-
-    if not java_path:
-        java_path = "java"
-
-    print(f"Using Java at: {java_path}")
+    # Set JAVA_HOME for child processes
+    java_home = os.path.dirname(os.path.dirname(java_path))
+    env = os.environ.copy()
+    env['JAVA_HOME'] = java_home
+    print(f"✓ JAVA_HOME: {java_home}")
 
     # Test Java installation
     try:
         java_test = subprocess.run([java_path, "-version"], 
-                                 capture_output=True, text=True, timeout=10)
+                                 capture_output=True, text=True, timeout=10, env=env)
         java_version = java_test.stderr.split('\n')[0] if java_test.stderr else "Unknown"
         print(f"✓ Java version: {java_version}")
     except Exception as e:
@@ -349,12 +376,15 @@ def install_greengrass_v2(thing_name, region, cert_path, private_key_path, root_
 
     print(f"✓ Found installer JAR at: {installer_jar}")
 
+    # Construct cacerts path using architecture detection
+    cacerts_path = f"{snap_dir}/etc/ssl/certs/java/cacerts"
+
     # Install Greengrass with debugging
     try:
         install_cmd = [
             java_path,
             "-Droot=" + greengrass_root,
-            "-Djavax.net.ssl.trustStore=$SNAP/etc/ssl/certs/java/cacerts",
+            f"-Djavax.net.ssl.trustStore={cacerts_path}",
             "-Djavax.net.ssl.trustStoreType=JKS",
             "-Dlog.store=FILE",
             "-jar", installer_jar,
@@ -367,7 +397,7 @@ def install_greengrass_v2(thing_name, region, cert_path, private_key_path, root_
         print(f"Installing Greengrass (without auto-start)...")
         print(f"Command: {' '.join(install_cmd)}")
 
-        result = subprocess.run(install_cmd, capture_output=True, text=True, timeout=120)
+        result = subprocess.run(install_cmd, capture_output=True, text=True, timeout=120, env=env)
 
         print(f"Installation completed with return code: {result.returncode}")
         if result.stdout:
@@ -382,7 +412,7 @@ def install_greengrass_v2(thing_name, region, cert_path, private_key_path, root_
 
             # Start Greengrass with debugging
             print("\n=== Starting Greengrass Nucleus ===")
-            start_result = start_greengrass_with_debugging(greengrass_root, java_path)
+            start_result = start_greengrass_with_debugging(greengrass_root, java_path, env)
 
             if start_result:
                 print("✓ Greengrass v2 is running")
@@ -406,8 +436,11 @@ def install_greengrass_v2(thing_name, region, cert_path, private_key_path, root_
         print(f"Error during Greengrass installation: {e}")
         return False
 
-def start_greengrass_with_debugging(greengrass_root, java_path):
+def start_greengrass_with_debugging(greengrass_root, java_path, env=None):
     """Start Greengrass with debugging output"""
+    if env is None:
+        env = os.environ.copy()
+
     try:
         nucleus_jar = f"{greengrass_root}/alts/current/distro/lib/Greengrass.jar"
 
@@ -422,7 +455,7 @@ def start_greengrass_with_debugging(greengrass_root, java_path):
         print("Starting in background (monitoring for 15 seconds)...")
 
         # Start as background process
-        process = subprocess.Popen(start_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        process = subprocess.Popen(start_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
 
         # Monitor startup for 15 seconds
         for i in range(15):
@@ -466,6 +499,10 @@ def main():
 
     print(f"AWS IoT Core and Greengrass Setup")
     print("=" * 40)
+
+    # Display architecture info
+    arch = get_architecture()
+    print(f"Running on architecture: {arch} ({platform.machine()})")
 
     # Get AWS credentials
     access_key, secret_key, region = get_aws_credentials()
